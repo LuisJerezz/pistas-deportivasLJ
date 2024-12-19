@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head th:replace="plantilla/fragmentos.html :: headfiles">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <div class="container-fluid">
+        <div th:replace="plantilla/fragmentos.html :: navigation"></div>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Instalación</th>
+                    <th>Inicio</th>
+                    <th>Fin</th>
+                    <th>Editar</th>
+                    <th>Borrar</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="reserva : ${reservas}">
+                    <td th:text="${reserva.id}">ID</td>
+                    <td th:text="${reserva.horario.instalacion.nombre}">Nombre Instalación</td>
+                    <td th:text="${reserva.horario.horaInicio}">Inicio</td>
+                    <td th:text="${reserva.horario.horaFin}">Fin</td>
+
+                </tr>
+            </tbody>
+
+        </table>
+    </div>
+</body>
