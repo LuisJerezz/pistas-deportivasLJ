@@ -9,7 +9,8 @@
 
 <body>
     <div class="container-fluid">
-        <div th:replace="plantilla/fragmentos.html :: navigation"></div>
+        <!-- Esta es la nueva sintaxis recomendada -->
+        <div th:replace="~{plantilla/fragmentos.html :: navigation}"></div>
         <div class="container-fluid">
             <form id="instalacionForm" method="get">
                 <label for="instalacion">Seleccione una instalación para filtrar:</label>

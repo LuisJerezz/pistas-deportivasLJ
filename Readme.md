@@ -1,5 +1,38 @@
 
 
+
+
+Para la inicialización de nuestro docker necesitamos el fichero ***.env*** con los siguientes parámetros:
+```bash
+MYSQL_ROOT_PASSWORD=zx76wbz7FG89k
+MYSQL_USERNAME=root
+MYSQL_PORT=33306
+MYSQL_HOST=localhost
+MYSQL_DATABASE=deporte
+ADMINER_PORT=8181
+SERVICE_PORT=8080
+```
+
+También necesitamos un fichero ***aplication.properties*** para la configuración de nuestra aplicación.
+```properties
+spring.application.name=pistasdeportivas
+
+spring.datasource.url=jdbc:mysql://localhost:33306/deporte
+spring.datasource.username=root
+spring.datasource.password=zx76wbz7FG89k
+
+spring.jpa.hibernate.ddl-auto=create-drop
+spring.sql.init.mode=always
+
+spring.jpa.defer-datasource-initialization=true
+
+spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.MySQL8Dialect
+```
+
+**¡¡¡NINGUNO DE LOS DOS FICHEROS ESTÁN EL REPOSITORIO DE GITHUB!!!**
+
+
+
 ### CRUD Reservas (OPERARIO Y ADMIN)
 | RUTA | VERBO | ACCIÓN | DESCRIPCIÓN |
 |----------|----------|----------|----------|

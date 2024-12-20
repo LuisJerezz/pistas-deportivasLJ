@@ -52,7 +52,7 @@ public class ConfiSec {
                     "/mis-datos/**", "/mis-datos/*/**" )
                     .authenticated()
                 .requestMatchers(
-                        "/reserva/**")
+                        "/reserva/**", "/reserva/*/**")
                     .hasAnyAuthority("ADMIN", "OPERARIO"))
                 
                 .exceptionHandling((exception)-> exception.
