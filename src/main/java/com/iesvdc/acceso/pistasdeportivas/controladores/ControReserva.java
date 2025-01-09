@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.iesvdc.acceso.pistasdeportivas.modelos.Reserva;
+import com.iesvdc.acceso.pistasdeportivas.repos.RepoInstalacion;
 import com.iesvdc.acceso.pistasdeportivas.repos.RepoReserva;
 import com.iesvdc.acceso.pistasdeportivas.repos.RepoUsuario;
 
@@ -31,6 +32,9 @@ public class ControReserva {
 
     @Autowired
     RepoUsuario repoUsuario;
+
+    @Autowired
+    RepoInstalacion repoInstalacion;
 
     
 
@@ -71,25 +75,25 @@ public class ControReserva {
     @GetMapping("/edit/{id}")
     public String editReserva(
         @PathVariable @NonNull Long id,
-        Model model){
+        Model model) {
 
         Optional<Reserva> opReserva = repoReserva.findById(id);
         if (opReserva.isPresent()) {
             model.addAttribute("reserva", opReserva.get());
             model.addAttribute("operacion", "EDIT");
-            model.addAttribute("instalaciones", repoUsuario.findAll());
+            model.addAttribute("instalaciones", repoInstalacion.findAll());
             return "reservas/add";
         } else {
             model.addAttribute("mensaje", "LA INSTALACIÓN NO EXISTE");
             model.addAttribute("titulo", "ERROR EN LA EDICIÓN DE LA INSTALACIÓN");
-            return "error";
+            return "/error";
         }
         
     }
     
 
     @PostMapping("/edit/{id}")
-    public String editHorario(
+    public String editReserva(
         @ModelAttribute("reserva") Reserva reserva) {
             repoReserva.save(reserva);
             return "redirect:/reservas";
