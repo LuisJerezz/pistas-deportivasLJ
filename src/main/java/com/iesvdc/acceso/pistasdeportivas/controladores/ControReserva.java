@@ -76,14 +76,19 @@ public class ControReserva {
     public String editReserva(
         @PathVariable @NonNull Long id,
         Model model) {
-
+        
+        System.out.println("ID recibido: " + id);  // Depuración
         Optional<Reserva> opReserva = repoReserva.findById(id);
+        
         if (opReserva.isPresent()) {
             model.addAttribute("reserva", opReserva.get());
             model.addAttribute("operacion", "EDIT");
             model.addAttribute("instalaciones", repoInstalacion.findAll());
-            return "reservas/add";
+            System.err.println("debug");
+            return "/reservas/add";
         } else {
+            System.err.println("----------------------------------------");
+        
             model.addAttribute("mensaje", "LA INSTALACIÓN NO EXISTE");
             model.addAttribute("titulo", "ERROR EN LA EDICIÓN DE LA INSTALACIÓN");
             return "/error";

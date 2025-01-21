@@ -25,9 +25,10 @@
                 <tr th:each="reserva : ${reservas}">
                     <td th:text="${reserva.id}">ID</td>
                     <td th:text="${reserva.horario.instalacion.nombre}">Nombre Instalación</td>
+                    <td th:text="${reserva.fecha}"></td>
                     <td th:text="${reserva.horario.horaInicio}">Inicio</td>
                     <td th:text="${reserva.horario.horaFin}">Fin</td>
-                    <td> <a class="btn btn-success" th:href="@{/reserva/edit/{id}(id=${reserva.id})}"> Editar </a> </td>
+                    <td> <a class="btn btn-success" th:href="|reserva/edit/${reserva.id}|"> Editar </a> </td>
                 </tr>
             </tbody>
 
