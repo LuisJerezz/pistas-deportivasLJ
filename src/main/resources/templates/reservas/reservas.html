@@ -14,7 +14,9 @@
             <thead>
                 <tr>
                     <th>#</th>
+                    <th>Usuario</th>
                     <th>Instalación</th>
+                    <th>Fecha</th>
                     <th>Inicio</th>
                     <th>Fin</th>
                     <th>Editar</th>
@@ -24,11 +26,13 @@
             <tbody>
                 <tr th:each="reserva : ${reservas}">
                     <td th:text="${reserva.id}">ID</td>
+                    <td th:text="${reserva.usuario.username}"></td>
                     <td th:text="${reserva.horario.instalacion.nombre}">Nombre Instalación</td>
                     <td th:text="${reserva.fecha}"></td>
                     <td th:text="${reserva.horario.horaInicio}">Inicio</td>
                     <td th:text="${reserva.horario.horaFin}">Fin</td>
-                    <td> <a class="btn btn-success" th:href="|reserva/edit/${reserva.id}|"> Editar </a> </td>
+                    <td> <a class="btn btn-success" th:href="|reserva/edit/${reserva.id}|"> Editar </a> </td> 
+                    <td> <a class="btn btn-danger" th:href="|reserva/del/${reserva.id}">Borrar</a></td>
                 </tr>
             </tbody>
 

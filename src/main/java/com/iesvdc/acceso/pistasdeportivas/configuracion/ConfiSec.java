@@ -52,8 +52,8 @@ public class ConfiSec {
                     "/mis-datos/**", "/mis-datos/*/**" )
                     .authenticated()
                 .requestMatchers(
-                        "/reserva/**")
-                    .permitAll())
+                        "/reserva/**", "/reserva/*/**")
+                    .authenticated())
                 
                 .exceptionHandling((exception)-> exception.
                     accessDeniedPage("/denegado") )

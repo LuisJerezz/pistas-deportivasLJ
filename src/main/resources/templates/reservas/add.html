@@ -17,6 +17,7 @@
             <form method="post" th:object="${reserva}" class="needs-validation" novalidate>
                 <input type="hidden" th:field="*{id}" />
                 
+  
                 <!-- Campo de Instalación (Solo lectura) -->
                 <div class="mb-3">
                     <label for="instalacion" class="form-label">Instalación</label>
@@ -26,16 +27,15 @@
                 <!-- Campo de Fecha (Calendario) -->
                 <div class="mb-3">
                     <label for="fecha" class="form-label">Fecha</label>
-                    <input type="date" id="fecha" name="fecha" class="form-control" th:field="*{fecha}" required />
+                    <input type="date" id="fecha" name="fecha" class="form-control" th:value="*{fecha}" required />
                 </div>
 
                 <!-- Selección de Horario (Desplegable) -->
                 <div class="mb-3">
                     <label for="horario" class="form-label">Horario</label>
-                    <select id="horario" name="horario" class="form-select" th:field="*{horario}" required>
-                        <option th:each="horario : ${horariosDisponibles}" th:value="${horario.id}" 
-                            th:text="${horario.horaInicio + ' - ' + horario.horaFin}" 
-                            th:selected="${reserva.horario != null and horario.id == reserva.horario.id}"></option>
+                    <select id="horario" name="hora" class="form-select" th:value="*{horario}" required>
+                        <option th:each="hora : ${horario}" 
+                            th:text="${hora.horaInicio + ' - ' + hora.horaFin}"></option>
                     </select>
                 </div>
 

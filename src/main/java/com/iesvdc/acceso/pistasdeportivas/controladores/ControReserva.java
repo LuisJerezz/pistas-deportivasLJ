@@ -16,9 +16,12 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.iesvdc.acceso.pistasdeportivas.modelos.Reserva;
+import com.iesvdc.acceso.pistasdeportivas.repos.RepoHorario;
 import com.iesvdc.acceso.pistasdeportivas.repos.RepoInstalacion;
 import com.iesvdc.acceso.pistasdeportivas.repos.RepoReserva;
 import com.iesvdc.acceso.pistasdeportivas.repos.RepoUsuario;
+
+
 
 
 
@@ -36,6 +39,9 @@ public class ControReserva {
     @Autowired
     RepoInstalacion repoInstalacion;
 
+    @Autowired 
+    RepoHorario repoHorario;
+
     
 
     @GetMapping("")
@@ -52,6 +58,10 @@ public class ControReserva {
     }
     
 
+    @GetMapping("horario/add/{id}")
+    public String getReservasPorHorario(@PathVariable @NonNull Long id, Model model) {
+        return new String();
+    }
     
     
 
@@ -83,6 +93,7 @@ public class ControReserva {
         if (opReserva.isPresent()) {
             model.addAttribute("reserva", opReserva.get());
             model.addAttribute("operacion", "EDIT");
+            model.addAttribute("horario", repoHorario.findAll());
             model.addAttribute("instalaciones", repoInstalacion.findAll());
             System.err.println("debug");
             return "/reservas/add";
@@ -101,6 +112,30 @@ public class ControReserva {
     public String editReserva(
         @ModelAttribute("reserva") Reserva reserva) {
             repoReserva.save(reserva);
-            return "redirect:/reservas";
+            return "redirect:/reserva";
         }
+
+
+    @GetMapping("/del/{id}")
+    public String delReserva(
+        @PathVariable @NonNull Long id, 
+        Model modelo) {
+
+        Optional<Reserva> oReserva = repoReserva.findById(id);
+        if (oReserva.isPresent() ){
+            modelo.addAttribute("reservas", repoReserva.findAll());
+            return "/reservas/del";
+        } else {
+            modelo.addAttribute("mensaje", "la reserva no existe");
+            modelo.addAttribute("titulo", "Error borrando la reserva");
+            return "/error";
+        }
+
+        
+    }
+    
+
 }
+
+
+
