@@ -4,6 +4,7 @@ INSERT INTO usuario (id, username, password, email, enabled, tipo) VALUES(2,	'pe
 INSERT INTO usuario (id, username, password, email, enabled, tipo) VALUES(5,	'admin',	'$2a$10$hWkDEd0V0QgmiffgPcSkoe1.OMq5ew.wl7OFBMqii5XkfxtIwzZ92',	'admin@correo.com', 1, 'ADMIN');
 INSERT INTO usuario (id, username, password, email, enabled, tipo) VALUES(7,	'obijuan',	'$2a$10$fXr4dWgx1hiIglBbJvsffORJ5aC1xBgN3QOs2IkwsPmtYACOxcgWG',	'darkside@starwars.com', 1, 'ADMIN');
 INSERT INTO usuario (id, username, password, email, enabled, tipo) VALUES(13,	'gerente',	'$2a$10$hWkDEd0V0QgmiffgPcSkoe1.OMq5ew.wl7OFBMqii5XkfxtIwzZ92',	'gerencia@vdc.com', 1, 'ADMIN');
+INSERT INTO usuario (id, username, password, email, enabled, tipo) VALUES(14,	'luisjerez',	'$2a$10$5CtTZeGfxvZqxQSVMkL3Ie86V9GT1sJTR/7WRSzyXSTZZDYDgA6ai',	'luisjerez@vdc.com', 1, 'USUARIO');
 
 -- INSERT INTO usuario_rol (authority, user_username) VALUES ('ADMIN', 'obijuan');
 -- INSERT INTO usuario_rol (authority, user_username) VALUES ('USER', 'obijuan');
