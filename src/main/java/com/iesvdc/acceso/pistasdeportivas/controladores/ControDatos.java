@@ -125,26 +125,28 @@ public class ControDatos {
     }
 
     @PostMapping("/mis-reservas/edit/{id}")
-    public String editReserva(
-            @PathVariable Long id,
-            @RequestParam("horarioId") Long horarioId,  // Obtener el ID del horario desde el formulario
-            @ModelAttribute("reserva") Reserva reserva) {
-            
-        Optional<Reserva> optReserva = repoReserva.findById(id);
-        Optional<Horario> optHorario = repoHorario.findById(horarioId);
-            
-        if (optReserva.isPresent() && optHorario.isPresent()) {
-            Reserva reservaActualizada = optReserva.get();
-            Horario nuevoHorario = optHorario.get();
+public String editReserva(
+        @PathVariable Long id,
+        @RequestParam("horarioId") Long horarioId,
+        @ModelAttribute("reserva") Reserva reserva) {
+    
+    Optional<Reserva> optReserva = repoReserva.findById(id);
+    Optional<Horario> optHorario = repoHorario.findById(horarioId);
+    
+    if (optReserva.isPresent() && optHorario.isPresent()) {
+        Reserva reservaActualizada = optReserva.get();
+        Horario nuevoHorario = optHorario.get();
 
-            reservaActualizada.setHorario(nuevoHorario); // Asignar el nuevo horario a la reserva
+        // Actualizar el horario y la fecha
+        reservaActualizada.setHorario(nuevoHorario);
+        reservaActualizada.setFecha(reserva.getFecha());  // Asegúrate de actualizar la fecha
 
-            repoReserva.save(reservaActualizada);  // Guardar la reserva actualizada
-            return "redirect:/mis-datos/mis-reservas";
-        }
-
-        return "error";
+        repoReserva.save(reservaActualizada);  // Guardar la reserva actualizada
+        return "redirect:/mis-datos/mis-reservas";
     }
+
+    return "error";
+}
 
 
     @GetMapping("/mis-reservas/add")
