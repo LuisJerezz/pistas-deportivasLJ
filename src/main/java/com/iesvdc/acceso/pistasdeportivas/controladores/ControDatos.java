@@ -1,5 +1,6 @@
 package com.iesvdc.acceso.pistasdeportivas.controladores;
 
+import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
@@ -19,6 +20,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.iesvdc.acceso.pistasdeportivas.modelos.Horario;
 import com.iesvdc.acceso.pistasdeportivas.modelos.Instalacion;
@@ -203,15 +205,30 @@ public String editReserva(
         @ModelAttribute("reserva") Reserva reserva,
         @RequestParam("instalacionId") Long instalacionId,
         @RequestParam("horarioId") Long horarioId,
-        Model model) {
+        RedirectAttributes redirectAttributes) { // Usamos RedirectAttributes para pasar mensajes
         
         Usuario usuario = getLoggedUser();
         Instalacion instalacion = repoInstalacion.findById(instalacionId).orElse(null);
         Horario horario = repoHorario.findById(horarioId).orElse(null);
         
         if (instalacion == null || horario == null) {
-            model.addAttribute("mensaje", "Error al crear la reserva. Verifique los datos seleccionados.");
-            return "error";
+            redirectAttributes.addFlashAttribute("mensajeError", "Error al crear la reserva. Verifique los datos seleccionados.");
+            return "redirect:/mis-datos/mis-reservas"; // Redirigir a la lista de reservas
+        }
+
+        // Validación de la fecha
+        LocalDate fechaReserva = reserva.getFecha();
+        LocalDate hoy = LocalDate.now();
+        LocalDate maxFechaPermitida = hoy.plusWeeks(2); // Dos semanas de antelación
+
+        if (fechaReserva.isBefore(hoy)) {
+            redirectAttributes.addFlashAttribute("mensajeError", "No se pueden hacer reservas en fechas anteriores a la actual.");
+            return "redirect:/mis-datos/mis-reservas"; // Redirigir a la lista de reservas
+        }
+
+        if (fechaReserva.isAfter(maxFechaPermitida)) {
+            redirectAttributes.addFlashAttribute("mensajeError", "No se pueden hacer reservas con más de dos semanas de antelación.");
+            return "redirect:/mis-datos/mis-reservas"; // Redirigir a la lista de reservas
         }
 
         reserva.setUsuario(usuario);
@@ -219,7 +236,7 @@ public String editReserva(
 
         repoReserva.save(reserva);
 
-        return "redirect:/mis-datos/mis-reservas";
+        return "redirect:/mis-datos/mis-reservas"; // Redirigir a la lista de reservas si todo está bien
     }
 
 
