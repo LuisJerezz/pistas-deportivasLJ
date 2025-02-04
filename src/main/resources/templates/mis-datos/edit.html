@@ -37,23 +37,13 @@
                     </div>
 
                     <div class="mb-3">
-                        <label for="horaInicio" class="form-label">Hora de Inicio</label>
-                        <select id="horaInicio" name="horario.horaInicio" class="form-control">
+                        <label for="horario" class="form-label">Horario</label>
+                        <select id="horario" name="horarioId" class="form-control" required>
+                            <option value="">Seleccione un horario</option>
                             <option th:each="horario : ${horariosDisponibles}" 
-                                    th:value="${horario.horaInicio}" 
-                                    th:text="${horario.horaInicio}"
-                                    th:selected="${horario.horaInicio == reserva.horario.horaInicio}">
-                            </option>
-                        </select>
-                    </div>
-
-                    <div class="mb-3">
-                        <label for="horaFin" class="form-label">Hora de Fin</label>
-                        <select id="horaFin" name="horario.horaFin" class="form-control">
-                            <option th:each="horario : ${horariosDisponibles}" 
-                                    th:value="${horario.horaFin}" 
-                                    th:text="${horario.horaFin}"
-                                    th:selected="${horario.horaFin == reserva.horario.horaFin}">
+                                    th:value="${horario.id}" 
+                                    th:text="${horario.horaInicio + ' - ' + horario.horaFin}"
+                                    th:selected="${horario.id == reserva.horario.id}">
                             </option>
                         </select>
                     </div>

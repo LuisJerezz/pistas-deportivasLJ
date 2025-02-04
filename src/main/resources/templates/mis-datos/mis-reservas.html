@@ -24,8 +24,7 @@
                             <th>ID</th>
                             <th>Instalación</th>
                             <th>Fecha</th>
-                            <th>Inicio</th>
-                            <th>Fin</th>
+                            <th>Horario</th> <!-- Columna combinada para horario -->
                             <th></th>
                         </tr>
                     </thead>
@@ -34,8 +33,8 @@
                             <td th:text="${reserva.id}">ID</td>
                             <td th:text="${reserva.horario.instalacion.nombre}">Nombre Instalación</td>
                             <td th:text="${reserva.fecha}"></td>
-                            <td th:text="${reserva.horario.horaInicio}">Inicio</td>
-                            <td th:text="${reserva.horario.horaFin}">Fin</td>
+                            <!-- Combinar horaInicio y horaFin en una sola celda -->
+                            <td th:text="${reserva.horario.horaInicio + ' - ' + reserva.horario.horaFin}">Horario</td>
                             <td>
                                 <a class="btn btn-success btn-sm" th:href="|mis-reservas/edit/${reserva.id}|">Editar</a>
                                 <a class="btn btn-danger btn-sm" th:href="|mis-reservas/del/${reserva.id}|">Borrar</a>
