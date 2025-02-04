@@ -104,39 +104,44 @@ public class ControDatos {
     public String editReserva( 
         @PathVariable @NonNull Long id,
         Model modelo) {
- 
+
         Optional<Reserva> oReserva = repoReserva.findById(id);
         if (oReserva.isPresent()) {
-            modelo.addAttribute("reserva", oReserva.get());
+            Reserva reserva = oReserva.get();
+            modelo.addAttribute("reserva", reserva);
             modelo.addAttribute("usuario", repoUsuario.findAll());
-            modelo.addAttribute("horario", repoHorario.findAll());
+
+            // Obtener los horarios disponibles para la instalación de la reserva
+            List<Horario> horariosDisponibles = repoHorario.findByInstalacion(reserva.getHorario().getInstalacion());
+            modelo.addAttribute("horariosDisponibles", horariosDisponibles);
+
             return "/mis-datos/edit";
         } else {
-            modelo.addAttribute("mensaje", "La reserva no exsiste");
+            modelo.addAttribute("mensaje", "La reserva no existe");
             modelo.addAttribute("titulo", "Error editando reserva.");
             return "/error";
         }
     }
 
     @PostMapping("/mis-reservas/edit/{id}")
-public String editReserva(@ModelAttribute("reserva") Reserva reserva) {
-    Usuario usuario = repoUsuario.findById(reserva.getUsuario().getId()).orElse(null);
-    Horario horario = repoHorario.findById(reserva.getHorario().getId()).orElse(null);
-
-    if (usuario != null && horario != null) {
-        // Actualizar los datos del horario
-        horario.setHoraInicio(reserva.getHorario().getHoraInicio());
-        horario.setHoraFin(reserva.getHorario().getHoraFin());
-
-        reserva.setUsuario(usuario);
-        reserva.setHorario(horario);
+    public String editReserva(@ModelAttribute("reserva") Reserva reserva) {
+        Usuario usuario = repoUsuario.findById(reserva.getUsuario().getId()).orElse(null);
+        Horario horario = repoHorario.findById(reserva.getHorario().getId()).orElse(null);
+    
+        if (usuario != null && horario != null) {
+            // Actualizar los datos del horario
+            horario.setHoraInicio(reserva.getHorario().getHoraInicio());
+            horario.setHoraFin(reserva.getHorario().getHoraFin());
         
-        repoHorario.save(horario);  // Guardar cambios en el horario
-        repoReserva.save(reserva);  // Guardar cambios en la reserva
+            reserva.setUsuario(usuario);
+            reserva.setHorario(horario);
+            
+            repoHorario.save(horario);  // Guardar cambios en el horario
+            repoReserva.save(reserva);  // Guardar cambios en la reserva
+        }
+    
+        return "redirect:/mis-datos/mis-reservas";
     }
-
-    return "redirect:/mis-datos/mis-reservas";
-}
 
 
 
