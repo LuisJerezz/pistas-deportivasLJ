@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{plantilla/fragmentos.html :: headfiles}">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -16,6 +16,21 @@
             <a class="btn btn-primary" th:href="|mis-reservas/add|">Agregar Reserva</a>
         </div>
 
+        <!-- Selector de instalaciones -->
+        <div class="mb-3">
+            <form method="get" th:action="@{/mis-datos/mis-reservas}">
+                <label for="instalacionId"><strong> Filtrar por instalación:</strong></label>
+                <select id="instalacionId" name="instalacionId" class="form-control" onchange="this.form.submit()">
+                    <option value="">Todas las instalaciones</option>
+                    <option th:each="instalacion : ${instalaciones}"
+                            th:value="${instalacion.id}"
+                            th:text="${instalacion.nombre}"
+                            th:selected="${instalacion.id == instalacionSeleccionada}">
+                    </option>
+                </select>
+            </form>
+        </div>
+
         <div class="container">
             <div class="border rounded-3 m-2 p-2 border-2">
                 <table class="table table-striped">
@@ -24,7 +39,7 @@
                             <th>ID</th>
                             <th>Instalación</th>
                             <th>Fecha</th>
-                            <th>Horario</th> <!-- Columna combinada para horario -->
+                            <th>Horario</th>
                             <th></th>
                         </tr>
                     </thead>
@@ -33,7 +48,6 @@
                             <td th:text="${reserva.id}">ID</td>
                             <td th:text="${reserva.horario.instalacion.nombre}">Nombre Instalación</td>
                             <td th:text="${reserva.fecha}"></td>
-                            <!-- Combinar horaInicio y horaFin en una sola celda -->
                             <td th:text="${reserva.horario.horaInicio + ' - ' + reserva.horario.horaFin}">Horario</td>
                             <td>
                                 <a class="btn btn-success btn-sm" th:href="|mis-reservas/edit/${reserva.id}|">Editar</a>
@@ -48,13 +62,13 @@
                 <nav aria-label="Page navigation example">
                     <ul class="pagination">
                         <li class="page-item">
-                            <a th:if="${instalacion} == null"  class="page-link"
-                                th:href="${page.hasPrevious()} ? |/horario?page=${page.number -1}| : '#'">
+                            <a th:if="${instalacionSeleccionada} == null" class="page-link"
+                                th:href="${page.hasPrevious()} ? |/mis-datos/mis-reservas?page=${page.number -1}| : '#'">
                                 <i class="fa-solid fa-chevron-left"></i>
                                 Anterior                            
                             </a>
-                            <a th:unless="${instalacion} == null" class="page-link"
-                                th:href="${page.hasPrevious()} ? |/horario/instalacion/${instalacion.id}?page=${page.number -1}| : '#'">
+                            <a th:unless="${instalacionSeleccionada} == null" class="page-link"
+                                th:href="${page.hasPrevious()} ? |/mis-datos/mis-reservas?instalacionId=${instalacionSeleccionada}&page=${page.number -1}| : '#'">
                                 <i class="fa-solid fa-chevron-left"></i>
                                 Anterior   
                             </a>
@@ -62,17 +76,16 @@
                         <li class="page-item"><a class="page-link active"
                                 th:text="|Estás en la página ${page.number+1} de ${page.totalPages}|" href="#">1</a></li>
                         <li class="page-item">
-                            <a th:if="${instalacion} == null" class="page-link"
-                                th:href="${page.hasNext()} ? |/horario?page=${page.number +1}| : '#'">
+                            <a th:if="${instalacionSeleccionada} == null" class="page-link"
+                                th:href="${page.hasNext()} ? |/mis-datos/mis-reservas?page=${page.number +1}| : '#'">
                                 Siguiente 
                                 <i class="fa-solid fa-chevron-right"></i>
                             </a>
-                            <a th:unless="${instalacion} == null" class="page-link"
-                                th:href="${page.hasNext()} ? |/horario/instalacion/${instalacion.id}?page=${page.number +1}| : '#'">
+                            <a th:unless="${instalacionSeleccionada} == null" class="page-link"
+                                th:href="${page.hasNext()} ? |/mis-datos/mis-reservas?instalacionId=${instalacionSeleccionada}&page=${page.number +1}| : '#'">
                                 Siguiente 
                                 <i class="fa-solid fa-chevron-right"></i>
                             </a>
-                            
                         </li>
                     </ul>
                 </nav>

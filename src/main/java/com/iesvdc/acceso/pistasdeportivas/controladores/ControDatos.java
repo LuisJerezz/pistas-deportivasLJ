@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.lang.NonNull;
@@ -92,14 +93,39 @@ public class ControDatos {
     }
 
     @GetMapping("/mis-reservas")
-    public String misReservas(Model modelo, 
-        @PageableDefault(size = 10, sort = "id") Pageable pageable) {
-        Usuario usuario = getLoggedUser();
-        Page<Reserva> page = repoReserva.findByUsuario(usuario, pageable); 
-        modelo.addAttribute("page", page);
-        modelo.addAttribute("reservas", page.getContent());
-        return "mis-datos/mis-reservas";
+public String misReservas(
+    @RequestParam(name = "instalacionId", required = false) Long instalacionId,
+    Model modelo, 
+    @PageableDefault(size = 10, sort = "id") Pageable pageable) {
+
+    Usuario usuario = getLoggedUser();
+    Page<Reserva> page;
+
+    // Obtener todas las reservas del usuario
+    List<Reserva> reservas = repoReserva.findByUsuario(usuario);
+
+    // Filtrar por instalación si se proporciona un instalacionId
+    if (instalacionId != null) {
+        reservas = reservas.stream()
+            .filter(reserva -> reserva.getHorario().getInstalacion().getId().equals(instalacionId))
+            .collect(Collectors.toList());
     }
+
+    // Convertir la lista filtrada a una página
+    int start = (int) pageable.getOffset();
+    int end = Math.min((start + pageable.getPageSize()), reservas.size());
+    page = new PageImpl<>(reservas.subList(start, end), pageable, reservas.size());
+
+    // Obtener todas las instalaciones para el selector
+    List<Instalacion> instalaciones = repoInstalacion.findAll();
+
+    modelo.addAttribute("page", page);
+    modelo.addAttribute("reservas", page.getContent());
+    modelo.addAttribute("instalaciones", instalaciones);
+    modelo.addAttribute("instalacionSeleccionada", instalacionId);
+
+    return "mis-datos/mis-reservas";
+}
 
     @GetMapping("/mis-reservas/edit/{id}")
     public String editReserva( 
