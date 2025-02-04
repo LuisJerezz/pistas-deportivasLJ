@@ -17,6 +17,7 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import com.iesvdc.acceso.pistasdeportivas.modelos.Horario;
 import com.iesvdc.acceso.pistasdeportivas.modelos.Instalacion;
@@ -143,22 +144,54 @@ public class ControDatos {
         return "redirect:/mis-datos/mis-reservas";
     }
 
-
-
-    /* @GetMapping("/mis-reservas/add")
-    public String addReserva(Model model) {
-        List<Instalacion> instalacionesLibres = repoInstalacion.encontrarInstalaciones();
-        model.addAttribute("reserva", new Reserva());
-        model.addAttribute("instalaciones", instalacionesLibres);
-        return "/mis-datos/add";
-    }
+        @GetMapping("/mis-reservas/add")
+    public String addReserva(@RequestParam(name = "instalacionId", required = false) Long instalacionId, Model model) {
+        // Obtener todas las instalaciones disponibles
+        List<Instalacion> instalaciones = repoInstalacion.findAll();
+        
+        // Crear una nueva reserva vacía
+        Reserva reserva = new Reserva();
+        reserva.setUsuario(getLoggedUser());
     
+        // Obtener los horarios disponibles según la instalación seleccionada
+        List<Horario> horariosDisponibles = (instalacionId != null) ? 
+            repoHorario.findByInstalacion(repoInstalacion.findById(instalacionId).orElse(null)) :
+            List.of(); // Lista vacía si no se ha seleccionado una instalación.
+    
+        // Agregar atributos al modelo
+        model.addAttribute("reserva", reserva);
+        model.addAttribute("instalaciones", instalaciones);
+        model.addAttribute("instalacionSeleccionada", instalacionId);
+        model.addAttribute("horariosDisponibles", horariosDisponibles);
+    
+        return "mis-datos/add";
+    }
+
     @PostMapping("/mis-reservas/add")
     public String addReserva(
-        @ModelAttribute("reserva") Reserva reserva)  {
+        @ModelAttribute("reserva") Reserva reserva,
+        @RequestParam("instalacionId") Long instalacionId,
+        @RequestParam("horarioId") Long horarioId,
+        Model model) {
+        
+        Usuario usuario = getLoggedUser();
+        Instalacion instalacion = repoInstalacion.findById(instalacionId).orElse(null);
+        Horario horario = repoHorario.findById(horarioId).orElse(null);
+        
+        if (instalacion == null || horario == null) {
+            model.addAttribute("mensaje", "Error al crear la reserva. Verifique los datos seleccionados.");
+            return "error";
+        }
+
+        reserva.setUsuario(usuario);
+        reserva.setHorario(horario);
+
         repoReserva.save(reserva);
-        return "redirect:/mis-reservas";
-    } */
+
+        return "redirect:/mis-datos/mis-reservas";
+    }
+
+
 
     @GetMapping("/mis-reservas/del/{id}")
     public String mostrarConfirmacionEliminacion(@PathVariable Long id, Model model) {
