@@ -104,10 +104,12 @@ public class ControDatos {
     public String editReserva( 
         @PathVariable @NonNull Long id,
         Model modelo) {
-
+ 
         Optional<Reserva> oReserva = repoReserva.findById(id);
         if (oReserva.isPresent()) {
             modelo.addAttribute("reserva", oReserva.get());
+            modelo.addAttribute("usuario", repoUsuario.findAll());
+            modelo.addAttribute("horario", repoHorario.findAll());
             return "/mis-datos/edit";
         } else {
             modelo.addAttribute("mensaje", "La reserva no exsiste");
@@ -117,12 +119,26 @@ public class ControDatos {
     }
 
     @PostMapping("/mis-reservas/edit/{id}")
-    public String editReserva(
-        @PathVariable @NonNull Long id,
-        @ModelAttribute("reserva") Reserva reserva)  {
-        repoReserva.save(reserva);
-        return "redirect:/mis-datos/mis-reservas"; 
+public String editReserva(@ModelAttribute("reserva") Reserva reserva) {
+    Usuario usuario = repoUsuario.findById(reserva.getUsuario().getId()).orElse(null);
+    Horario horario = repoHorario.findById(reserva.getHorario().getId()).orElse(null);
+
+    if (usuario != null && horario != null) {
+        // Actualizar los datos del horario
+        horario.setHoraInicio(reserva.getHorario().getHoraInicio());
+        horario.setHoraFin(reserva.getHorario().getHoraFin());
+
+        reserva.setUsuario(usuario);
+        reserva.setHorario(horario);
+        
+        repoHorario.save(horario);  // Guardar cambios en el horario
+        repoReserva.save(reserva);  // Guardar cambios en la reserva
     }
+
+    return "redirect:/mis-datos/mis-reservas";
+}
+
+
 
     /* @GetMapping("/mis-reservas/add")
     public String addReserva(Model model) {
@@ -145,7 +161,7 @@ public class ControDatos {
             Reserva reserva = repoReserva.findById(id).orElse(null);
             if (reserva != null) {
                 model.addAttribute("reserva", reserva);
-                return "mis-datos/del";  // Aquí cargamos la vista con el formulario de confirmación
+                return "mis-datos/del";
             } else {
                 model.addAttribute("mensaje", "Reserva no encontrada.");
                 return "error";
@@ -174,83 +190,5 @@ public class ControDatos {
             return "error";
         }
     }
-
-    /* @GetMapping("/mis-reservas/edit/{id}")
-    public String editReserva(@PathVariable @NonNull Long id, Model modelo) {
-        Optional<Reserva> oReserva = repoReserva.findById(id);
-        if (oReserva.isPresent()) {
-            modelo.addAttribute("reserva", oReserva.get());
-            modelo.addAttribute("instalaciones", repoInstalacion.findAll());
-            modelo.addAttribute("horarios", repoHorario.findAll().stream()
-                .sorted(Comparator.comparing(Horario::getHoraInicio))
-                .collect(Collectors.toList()));
-            return "mis-datos/edit";
-        } else {
-            modelo.addAttribute("mensaje", "La reserva no existe.");
-            modelo.addAttribute("titulo", "Error editando reserva.");
-            return "error"; 
-        }
-    }
-
-
-    @PostMapping("/mis-reservas/edit/{id}")
-    public String editReserva(@PathVariable @NonNull Long id, 
-    @Validated @ModelAttribute("reserva") Reserva reserva, 
-    BindingResult result, 
-    Model modelo) {
-
-        if (result.hasErrors()) {
-            modelo.addAttribute("mensaje", "Por favor corrija los errores en el formulario.");
-            modelo.addAttribute("instalaciones", repoInstalacion.findAll());
-            modelo.addAttribute("horarios", repoHorario.findAll().stream()
-                .sorted(Comparator.comparing(Horario::getHoraInicio))
-                .collect(Collectors.toList()));
-            return "mis-datos/edit"; 
-        }
-
-        try {
-            if (reserva.getHorario() == null || reserva.getHorario().getId() == null) {
-                result.rejectValue("horario", "error.reserva", "Horario es obligatorio");
-                modelo.addAttribute("mensaje", "El horario es obligatorio.");
-                modelo.addAttribute("instalaciones", repoInstalacion.findAll());
-                modelo.addAttribute("horarios", repoHorario.findAll().stream()
-                    .sorted(Comparator.comparing(Horario::getHoraInicio))
-                    .collect(Collectors.toList()));
-                return "mis-datos/edit"; 
-            }
-
-            Horario horarioSeleccionado = repoHorario.findById(reserva.getHorario().getId())
-                .orElse(null);
-            if (horarioSeleccionado == null) {
-                result.rejectValue("horario", "error.reserva", "Horario inválido");
-                modelo.addAttribute("mensaje", "Horario inválido.");
-                modelo.addAttribute("instalaciones", repoInstalacion.findAll());
-                modelo.addAttribute("horarios", repoHorario.findAll().stream()
-                    .sorted(Comparator.comparing(Horario::getHoraInicio))
-                    .collect(Collectors.toList()));
-            return "mis-datos/edit";
-            }
-
-            reserva.setHorario(horarioSeleccionado);
-        
-            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-            Usuario usuario = repoUsuario.findByUsername(authentication.getName()).get(0);
-            reserva.setUsuario(usuario);
-
-            repoReserva.save(reserva);
-        } catch (Exception e) {
-            modelo.addAttribute("mensaje", e.getMessage());
-            modelo.addAttribute("instalaciones", repoInstalacion.findAll());
-            modelo.addAttribute("horarios", repoHorario.findAll().stream()
-                .sorted(Comparator.comparing(Horario::getHoraInicio))
-                .collect(Collectors.toList()));
-            e.printStackTrace();
-        return "mis-datos/edit";
-        }
-
-        return "redirect:/mis-datos/mis-reservas"; 
-    } */
-    
-
     
 }
