@@ -1,5 +1,6 @@
 package com.iesvdc.acceso.pistasdeportivas.controladores;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,14 +15,14 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
+import com.iesvdc.acceso.pistasdeportivas.modelos.Horario;
 import com.iesvdc.acceso.pistasdeportivas.modelos.Reserva;
 import com.iesvdc.acceso.pistasdeportivas.repos.RepoHorario;
 import com.iesvdc.acceso.pistasdeportivas.repos.RepoInstalacion;
 import com.iesvdc.acceso.pistasdeportivas.repos.RepoReserva;
 import com.iesvdc.acceso.pistasdeportivas.repos.RepoUsuario;
-
-
 
 
 
@@ -37,10 +38,10 @@ public class ControReserva {
     RepoUsuario repoUsuario;
 
     @Autowired
-    RepoInstalacion repoInstalacion;
-
-    @Autowired 
     RepoHorario repoHorario;
+
+    @Autowired
+    RepoInstalacion repoInstalacion;
 
     
 
@@ -58,10 +59,6 @@ public class ControReserva {
     }
     
 
-    @GetMapping("horario/add/{id}")
-    public String getReservasPorHorario(@PathVariable @NonNull Long id, Model model) {
-        return new String();
-    }
     
     
 
@@ -86,20 +83,16 @@ public class ControReserva {
     public String editReserva(
         @PathVariable @NonNull Long id,
         Model model) {
-        
-        System.out.println("ID recibido: " + id);  // Depuración
+
         Optional<Reserva> opReserva = repoReserva.findById(id);
-        
         if (opReserva.isPresent()) {
+            Reserva reserva = opReserva.get();
             model.addAttribute("reserva", opReserva.get());
-            model.addAttribute("operacion", "EDIT");
-            model.addAttribute("horario", repoHorario.findAll());
             model.addAttribute("instalaciones", repoInstalacion.findAll());
-            System.err.println("debug");
-            return "/reservas/add";
+            List<Horario> horarios = repoHorario.findByInstalacion(reserva.getHorario().getInstalacion());
+            model.addAttribute("horario", horarios);
+            return "reservas/add";
         } else {
-            System.err.println("----------------------------------------");
-        
             model.addAttribute("mensaje", "LA INSTALACIÓN NO EXISTE");
             model.addAttribute("titulo", "ERROR EN LA EDICIÓN DE LA INSTALACIÓN");
             return "/error";
@@ -110,32 +103,30 @@ public class ControReserva {
 
     @PostMapping("/edit/{id}")
     public String editReserva(
+        @PathVariable Long id,
+        @RequestParam("horarioId") Long horarioId,
         @ModelAttribute("reserva") Reserva reserva) {
-            repoReserva.save(reserva);
-            return "redirect:/reserva";
-        }
-
-
-    @GetMapping("/del/{id}")
-    public String delReserva(
-        @PathVariable @NonNull Long id, 
-        Model modelo) {
-
-        Optional<Reserva> oReserva = repoReserva.findById(id);
-        if (oReserva.isPresent() ){
-            modelo.addAttribute("reservas", repoReserva.findAll());
-            return "/reservas/del";
-        } else {
-            modelo.addAttribute("mensaje", "la reserva no existe");
-            modelo.addAttribute("titulo", "Error borrando la reserva");
-            return "/error";
-        }
-
-        
-    }
     
+        
+    Optional<Reserva> optReserva = repoReserva.findById(id);
+    Optional<Horario> optHorario = repoHorario.findById(horarioId);
+    
+    
+        Reserva reservaActualizada = optReserva.get();
+        Horario nuevoHorario = optHorario.get();
 
+        // Actualizar el horario y la fecha
+        reservaActualizada.setHorario(nuevoHorario);
+        reservaActualizada.setFecha(reserva.getFecha());  // Asegúrate de actualizar la fecha
+
+        repoReserva.save(reservaActualizada);  // Guardar la reserva actualizada
+        return "redirect:/reserva";
+    }
+
+    
+    
+    
 }
-
+    
 
 

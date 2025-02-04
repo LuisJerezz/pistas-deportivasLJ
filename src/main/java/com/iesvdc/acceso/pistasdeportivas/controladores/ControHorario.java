@@ -91,7 +91,6 @@ public class ControHorario {
         Optional<Horario> oHorario = repoHorario.findById(id);
         if (oHorario.isPresent()) {
             modelo.addAttribute("horario", oHorario.get());
-            modelo.addAttribute("operacion", "EDIT");
             modelo.addAttribute("instalaciones", repoInstalacion.findAll());
             return "/horarios/add";
         } else {
