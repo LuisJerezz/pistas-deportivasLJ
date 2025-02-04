@@ -125,29 +125,29 @@ public class ControDatos {
     }
 
     @PostMapping("/mis-reservas/edit/{id}")
-public String editReserva(
-        @PathVariable Long id,
-        @RequestParam("horarioId") Long horarioId,  // Obtener el ID del horario desde el formulario
-        @ModelAttribute("reserva") Reserva reserva) {
-    
-    Optional<Reserva> optReserva = repoReserva.findById(id);
-    Optional<Horario> optHorario = repoHorario.findById(horarioId);
-    
-    if (optReserva.isPresent() && optHorario.isPresent()) {
-        Reserva reservaActualizada = optReserva.get();
-        Horario nuevoHorario = optHorario.get();
-        
-        reservaActualizada.setHorario(nuevoHorario); // Asignar el nuevo horario a la reserva
-        
-        repoReserva.save(reservaActualizada);  // Guardar la reserva actualizada
-        return "redirect:/mis-datos/mis-reservas";
+    public String editReserva(
+            @PathVariable Long id,
+            @RequestParam("horarioId") Long horarioId,  // Obtener el ID del horario desde el formulario
+            @ModelAttribute("reserva") Reserva reserva) {
+            
+        Optional<Reserva> optReserva = repoReserva.findById(id);
+        Optional<Horario> optHorario = repoHorario.findById(horarioId);
+            
+        if (optReserva.isPresent() && optHorario.isPresent()) {
+            Reserva reservaActualizada = optReserva.get();
+            Horario nuevoHorario = optHorario.get();
+
+            reservaActualizada.setHorario(nuevoHorario); // Asignar el nuevo horario a la reserva
+
+            repoReserva.save(reservaActualizada);  // Guardar la reserva actualizada
+            return "redirect:/mis-datos/mis-reservas";
+        }
+
+        return "error";
     }
-    
-    return "error";
-}
 
 
-        @GetMapping("/mis-reservas/add")
+    @GetMapping("/mis-reservas/add")
     public String addReserva(@RequestParam(name = "instalacionId", required = false) Long instalacionId, Model model) {
         // Obtener todas las instalaciones disponibles
         List<Instalacion> instalaciones = repoInstalacion.findAll();
