@@ -41,16 +41,14 @@
                 <table class="table table-striped">
                     <thead>
                         <tr>
-                            <th>ID</th>
                             <th>Instalación</th>
                             <th>Fecha</th>
                             <th>Horario</th>
-                            <th></th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr th:each="reserva : ${reservas}">
-                            <td th:text="${reserva.id}">ID</td>
+                            <td th:text="${reserva.id}" hidden>ID</td>
                             <td th:text="${reserva.horario.instalacion.nombre}">Nombre Instalación</td>
                             <td th:text="${reserva.fecha}"></td>
                             <td th:text="${reserva.horario.horaInicio + ' - ' + reserva.horario.horaFin}">Horario</td>

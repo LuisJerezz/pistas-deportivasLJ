@@ -23,12 +23,12 @@
 
                     <div class="mb-3">
                         <label for="id" class="form-label">ID</label>
-                        <input type="text" id="id" name="id" class="form-control" th:value="${reserva.id}" readonly>
+                        <input type="text" id="id" name="id" class="form-control" th:value="${reserva.id}" disabled>
                     </div>
 
                     <div class="mb-3">
                         <label for="instalacion" class="form-label">Instalación</label>
-                        <input type="text" id="instalacion" name="instalacion" class="form-control" th:value="${reserva.horario.instalacion.nombre}" readonly>
+                        <input type="text" id="instalacion" name="instalacion" class="form-control" th:value="${reserva.horario.instalacion.nombre}" disabled>
                     </div>
 
                     <div class="mb-3">

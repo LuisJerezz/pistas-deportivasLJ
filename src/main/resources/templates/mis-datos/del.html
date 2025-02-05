@@ -16,27 +16,27 @@
                 <form th:action="@{/mis-datos/mis-reservas/del/{id}(id=${reserva.id})}" method="post">
                     <div class="mb-3">
                         <label for="id" class="form-label">ID</label>
-                        <input type="text" id="id" name="id" class="form-control" th:value="${reserva.id}" readonly>
+                        <input type="text" id="id" name="id" class="form-control" th:value="${reserva.id}" disabled>
                     </div>
 
                     <div class="mb-3">
                         <label for="instalacion" class="form-label">Instalación</label>
-                        <input type="text" id="instalacion" name="instalacion" class="form-control" th:value="${reserva.horario.instalacion.nombre}" readonly>
+                        <input type="text" id="instalacion" name="instalacion" class="form-control" th:value="${reserva.horario.instalacion.nombre}" disabled>
                     </div>
 
                     <div class="mb-3">
                         <label for="fecha" class="form-label">Fecha</label>
-                        <input type="date" id="fecha" name="fecha" class="form-control" th:value="${reserva.fecha}" readonly>
+                        <input type="date" id="fecha" name="fecha" class="form-control" th:value="${reserva.fecha}" disabled>
                     </div>
 
                     <div class="mb-3">
                         <label for="horaInicio" class="form-label">Hora de Inicio</label>
-                        <input type="time" id="horaInicio" name="horaInicio" class="form-control" th:value="${reserva.horario.horaInicio}" readonly>
+                        <input type="time" id="horaInicio" name="horaInicio" class="form-control" th:value="${reserva.horario.horaInicio}" disabled>
                     </div>
 
                     <div class="mb-3">
                         <label for="horaFin" class="form-label">Hora de Fin</label>
-                        <input type="time" id="horaFin" name="horaFin" class="form-control" th:value="${reserva.horario.horaFin}" readonly>
+                        <input type="time" id="horaFin" name="horaFin" class="form-control" th:value="${reserva.horario.horaFin}" disabled>
                     </div>
 
                     <div class="d-flex gap-2">
