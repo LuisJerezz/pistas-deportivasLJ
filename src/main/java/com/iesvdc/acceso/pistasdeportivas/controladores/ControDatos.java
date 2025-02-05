@@ -222,6 +222,15 @@ public class ControDatos {
             return "redirect:/mis-datos/mis-reservas";
         }
 
+        List<Reserva> reservasDelUsuario = repoReserva.findByUsuario(usuario);
+        boolean yaTieneReservaEnFecha = reservasDelUsuario.stream()
+            .anyMatch(r -> r.getFecha().isEqual(fechaReserva));
+
+        if (yaTieneReservaEnFecha) {
+            redirectAttributes.addFlashAttribute("mensajeError", "Ya tienes una reserva para esa fecha. Solo se permite una reserva por día.");
+            return "redirect:/mis-datos/mis-reservas";
+        }
+
         reserva.setUsuario(usuario);
         reserva.setHorario(horario);
 

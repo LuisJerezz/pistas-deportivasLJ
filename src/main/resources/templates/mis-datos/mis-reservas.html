@@ -58,39 +58,25 @@
                 </table>
             </div>
             <div>
-                <p>
                 <nav aria-label="Page navigation example">
                     <ul class="pagination">
                         <li class="page-item">
-                            <a th:if="${instalacionSeleccionada} == null" class="page-link"
-                                th:href="${page.hasPrevious()} ? |/mis-datos/mis-reservas?page=${page.number -1}| : '#'">
-                                <i class="fa-solid fa-chevron-left"></i>
-                                Anterior                            
-                            </a>
-                            <a th:unless="${instalacionSeleccionada} == null" class="page-link"
-                                th:href="${page.hasPrevious()} ? |/mis-datos/mis-reservas?instalacionId=${instalacionSeleccionada}&page=${page.number -1}| : '#'">
-                                <i class="fa-solid fa-chevron-left"></i>
-                                Anterior   
+                            <a class="page-link" th:href="${page.hasPrevious()} ? |/mis-datos/mis-reservas?page=${page.number -1}| : '#'">
+                                <i class="fa-solid fa-chevron-left"></i> Anterior
                             </a>
                         </li>
-                        <li class="page-item"><a class="page-link active"
-                                th:text="|Estás en la página ${page.number+1} de ${page.totalPages}|" href="#">1</a></li>
                         <li class="page-item">
-                            <a th:if="${instalacionSeleccionada} == null" class="page-link"
-                                th:href="${page.hasNext()} ? |/mis-datos/mis-reservas?page=${page.number +1}| : '#'">
-                                Siguiente 
-                                <i class="fa-solid fa-chevron-right"></i>
-                            </a>
-                            <a th:unless="${instalacionSeleccionada} == null" class="page-link"
-                                th:href="${page.hasNext()} ? |/mis-datos/mis-reservas?instalacionId=${instalacionSeleccionada}&page=${page.number +1}| : '#'">
-                                Siguiente 
-                                <i class="fa-solid fa-chevron-right"></i>
+                            <span class="page-link active" th:text="|Página ${page.number+1} de ${page.totalPages}|"></span>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" th:href="${page.hasNext()} ? |/mis-datos/mis-reservas?page=${page.number +1}| : '#'">
+                                Siguiente <i class="fa-solid fa-chevron-right"></i>
                             </a>
                         </li>
                     </ul>
                 </nav>
-                </p>
             </div>
+            
         </div>
 
         <div th:replace="~{plantilla/fragmentos.html :: footer}"></div>
