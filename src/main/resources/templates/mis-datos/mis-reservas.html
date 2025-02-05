@@ -11,17 +11,14 @@
 
         <h3>Mis Reservas</h3>
 
-        <!-- Mostrar mensaje de error si existe -->
         <div th:if="${mensajeError}" class="alert alert-danger" role="alert">
             <span th:text="${mensajeError}"></span>
         </div>
 
-        <!-- Botón para agregar una nueva reserva -->
         <div class="mb-3">
             <a class="btn btn-primary" th:href="|mis-reservas/add|">Agregar Reserva</a>
         </div>
 
-        <!-- Selector de instalaciones -->
         <div class="mb-3">
             <form method="get" th:action="@{/mis-datos/mis-reservas}">
                 <label for="instalacionId"><strong> Filtrar por instalación:</strong></label>

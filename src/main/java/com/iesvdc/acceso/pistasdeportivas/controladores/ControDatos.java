@@ -95,103 +95,95 @@ public class ControDatos {
     }
 
     @GetMapping("/mis-reservas")
-public String misReservas(
-    @RequestParam(name = "instalacionId", required = false) Long instalacionId,
-    Model modelo, 
-    @PageableDefault(size = 10, sort = "id") Pageable pageable) {
+    public String misReservas(
+        @RequestParam(name = "instalacionId", required = false) Long instalacionId,
+        Model modelo, 
+        @PageableDefault(size = 10, sort = "id") Pageable pageable) {
 
-    Usuario usuario = getLoggedUser();
-    Page<Reserva> page;
+        Usuario usuario = getLoggedUser();
+        Page<Reserva> page;
 
-    // Obtener todas las reservas del usuario
-    List<Reserva> reservas = repoReserva.findByUsuario(usuario);
+        List<Reserva> reservas = repoReserva.findByUsuario(usuario);
 
-    // Filtrar por instalación si se proporciona un instalacionId
-    if (instalacionId != null) {
-        reservas = reservas.stream()
-            .filter(reserva -> reserva.getHorario().getInstalacion().getId().equals(instalacionId))
-            .collect(Collectors.toList());
+        if (instalacionId != null) {
+            reservas = reservas.stream()
+                .filter(reserva -> reserva.getHorario().getInstalacion().getId().equals(instalacionId))
+                .collect(Collectors.toList());
+        }
+
+        int start = (int) pageable.getOffset();
+        int end = Math.min((start + pageable.getPageSize()), reservas.size());
+        page = new PageImpl<>(reservas.subList(start, end), pageable, reservas.size());
+
+        List<Instalacion> instalaciones = repoInstalacion.findAll();
+
+        modelo.addAttribute("page", page);
+        modelo.addAttribute("reservas", page.getContent());
+        modelo.addAttribute("instalaciones", instalaciones);
+        modelo.addAttribute("instalacionSeleccionada", instalacionId);
+
+        return "mis-datos/mis-reservas";
     }
 
-    // Convertir la lista filtrada a una página
-    int start = (int) pageable.getOffset();
-    int end = Math.min((start + pageable.getPageSize()), reservas.size());
-    page = new PageImpl<>(reservas.subList(start, end), pageable, reservas.size());
-
-    // Obtener todas las instalaciones para el selector
-    List<Instalacion> instalaciones = repoInstalacion.findAll();
-
-    modelo.addAttribute("page", page);
-    modelo.addAttribute("reservas", page.getContent());
-    modelo.addAttribute("instalaciones", instalaciones);
-    modelo.addAttribute("instalacionSeleccionada", instalacionId);
-
-    return "mis-datos/mis-reservas";
-}
-
     @GetMapping("/mis-reservas/edit/{id}")
-    public String editReserva( 
-        @PathVariable @NonNull Long id,
-        Model modelo) {
-
+    public String editReserva(@PathVariable @NonNull Long id, Model modelo, RedirectAttributes redirectAttributes) {
         Optional<Reserva> oReserva = repoReserva.findById(id);
         if (oReserva.isPresent()) {
             Reserva reserva = oReserva.get();
+            LocalDate fechaActual = LocalDate.now();
+
+            if (reserva.getFecha().isBefore(fechaActual) || reserva.getFecha().isEqual(fechaActual)) {
+                redirectAttributes.addFlashAttribute("mensajeError", "No se puede editar una reserva que ya ha pasado o está programada para hoy.");
+                return "redirect:/mis-datos/mis-reservas";
+            }
+
             modelo.addAttribute("reserva", reserva);
             modelo.addAttribute("usuario", repoUsuario.findAll());
 
-            // Obtener los horarios disponibles para la instalación de la reserva
             List<Horario> horariosDisponibles = repoHorario.findByInstalacion(reserva.getHorario().getInstalacion());
             modelo.addAttribute("horariosDisponibles", horariosDisponibles);
 
             return "/mis-datos/edit";
         } else {
-            modelo.addAttribute("mensaje", "La reserva no existe");
-            modelo.addAttribute("titulo", "Error editando reserva.");
-            return "/error";
+            redirectAttributes.addFlashAttribute("mensajeError", "La reserva no existe.");
+            return "redirect:/mis-datos/mis-reservas";
         }
     }
 
     @PostMapping("/mis-reservas/edit/{id}")
-public String editReserva(
-        @PathVariable Long id,
-        @RequestParam("horarioId") Long horarioId,
-        @ModelAttribute("reserva") Reserva reserva) {
-    
-    Optional<Reserva> optReserva = repoReserva.findById(id);
-    Optional<Horario> optHorario = repoHorario.findById(horarioId);
-    
-    if (optReserva.isPresent() && optHorario.isPresent()) {
-        Reserva reservaActualizada = optReserva.get();
-        Horario nuevoHorario = optHorario.get();
+    public String editReserva(
+            @PathVariable Long id,
+            @RequestParam("horarioId") Long horarioId,
+            @ModelAttribute("reserva") Reserva reserva) {
+            
+        Optional<Reserva> optReserva = repoReserva.findById(id);
+        Optional<Horario> optHorario = repoHorario.findById(horarioId);
+            
+        if (optReserva.isPresent() && optHorario.isPresent()) {
+            Reserva reservaActualizada = optReserva.get();
+            Horario nuevoHorario = optHorario.get();
 
-        // Actualizar el horario y la fecha
-        reservaActualizada.setHorario(nuevoHorario);
-        reservaActualizada.setFecha(reserva.getFecha());  // Asegúrate de actualizar la fecha
+            reservaActualizada.setHorario(nuevoHorario);
+            reservaActualizada.setFecha(reserva.getFecha());
 
-        repoReserva.save(reservaActualizada);  // Guardar la reserva actualizada
-        return "redirect:/mis-datos/mis-reservas";
+            repoReserva.save(reservaActualizada);
+            return "redirect:/mis-datos/mis-reservas";
+        }
+
+        return "error";
     }
-
-    return "error";
-}
-
 
     @GetMapping("/mis-reservas/add")
     public String addReserva(@RequestParam(name = "instalacionId", required = false) Long instalacionId, Model model) {
-        // Obtener todas las instalaciones disponibles
         List<Instalacion> instalaciones = repoInstalacion.findAll();
         
-        // Crear una nueva reserva vacía
         Reserva reserva = new Reserva();
         reserva.setUsuario(getLoggedUser());
     
-        // Obtener los horarios disponibles según la instalación seleccionada
         List<Horario> horariosDisponibles = (instalacionId != null) ? 
             repoHorario.findByInstalacion(repoInstalacion.findById(instalacionId).orElse(null)) :
-            List.of(); // Lista vacía si no se ha seleccionado una instalación.
+            List.of();
     
-        // Agregar atributos al modelo
         model.addAttribute("reserva", reserva);
         model.addAttribute("instalaciones", instalaciones);
         model.addAttribute("instalacionSeleccionada", instalacionId);
@@ -205,7 +197,7 @@ public String editReserva(
         @ModelAttribute("reserva") Reserva reserva,
         @RequestParam("instalacionId") Long instalacionId,
         @RequestParam("horarioId") Long horarioId,
-        RedirectAttributes redirectAttributes) { // Usamos RedirectAttributes para pasar mensajes
+        RedirectAttributes redirectAttributes) {
         
         Usuario usuario = getLoggedUser();
         Instalacion instalacion = repoInstalacion.findById(instalacionId).orElse(null);
@@ -213,22 +205,21 @@ public String editReserva(
         
         if (instalacion == null || horario == null) {
             redirectAttributes.addFlashAttribute("mensajeError", "Error al crear la reserva. Verifique los datos seleccionados.");
-            return "redirect:/mis-datos/mis-reservas"; // Redirigir a la lista de reservas
+            return "redirect:/mis-datos/mis-reservas";
         }
 
-        // Validación de la fecha
         LocalDate fechaReserva = reserva.getFecha();
         LocalDate hoy = LocalDate.now();
-        LocalDate maxFechaPermitida = hoy.plusWeeks(2); // Dos semanas de antelación
+        LocalDate maxFechaPermitida = hoy.plusWeeks(1);
 
         if (fechaReserva.isBefore(hoy)) {
             redirectAttributes.addFlashAttribute("mensajeError", "No se pueden hacer reservas en fechas anteriores a la actual.");
-            return "redirect:/mis-datos/mis-reservas"; // Redirigir a la lista de reservas
+            return "redirect:/mis-datos/mis-reservas";
         }
 
         if (fechaReserva.isAfter(maxFechaPermitida)) {
-            redirectAttributes.addFlashAttribute("mensajeError", "No se pueden hacer reservas con más de dos semanas de antelación.");
-            return "redirect:/mis-datos/mis-reservas"; // Redirigir a la lista de reservas
+            redirectAttributes.addFlashAttribute("mensajeError", "No se pueden hacer reservas con más de una semana de antelación.");
+            return "redirect:/mis-datos/mis-reservas";
         }
 
         reserva.setUsuario(usuario);
@@ -236,10 +227,8 @@ public String editReserva(
 
         repoReserva.save(reserva);
 
-        return "redirect:/mis-datos/mis-reservas"; // Redirigir a la lista de reservas si todo está bien
+        return "redirect:/mis-datos/mis-reservas";
     }
-
-
 
     @GetMapping("/mis-reservas/del/{id}")
     public String mostrarConfirmacionEliminacion(@PathVariable Long id, Model model) {
@@ -265,7 +254,7 @@ public String editReserva(
             Reserva reserva = repoReserva.findById(id).orElse(null);
             if (reserva != null) {
                 repoReserva.delete(reserva);
-                return "redirect:/mis-datos/mis-reservas";  // Redirigir a la lista de reservas
+                return "redirect:/mis-datos/mis-reservas";
             } else {
                 model.addAttribute("mensaje", "Reserva no encontrada.");
                 return "error";

@@ -14,7 +14,6 @@
         <div class="container">
             <div class="border rounded-3 m-2 p-4 border-2">
 
-                <!-- Formulario para seleccionar instalación (GET) -->
                 <form th:action="@{/mis-datos/mis-reservas/add}" method="get">
                     <div class="mb-3">
                         <label for="instalacion" class="form-label">Instalación</label>
@@ -30,7 +29,6 @@
                     </div>
                 </form>
 
-                <!-- Formulario principal de reserva (POST) -->
                 <form th:action="@{/mis-datos/mis-reservas/add}" th:object="${reserva}" method="post">
                     <input type="hidden" name="usuario.id" th:value="${reserva.usuario.id}">
                     <input type="hidden" name="instalacionId" th:value="${instalacionSeleccionada}">
