@@ -18,4 +18,6 @@ public interface RepoReserva extends JpaRepository<Reserva,Long>{
     
     Page<Reserva> findByUsuario(Usuario usuario, Pageable pageable);
 
+    Page<Reserva> findByUsuarioId(Long usuarioId, Pageable pageable);
+
 }

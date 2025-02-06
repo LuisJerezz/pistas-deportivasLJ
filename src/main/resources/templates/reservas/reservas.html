@@ -9,33 +9,58 @@
 
 <body>
     <div class="container-fluid">
+        
         <div th:replace="plantilla/fragmentos.html :: navigation"></div>
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>#</th>
-                    <th>Usuario</th>
-                    <th>Instalación</th>
-                    <th>Fecha</th>
-                    <th>Inicio</th>
-                    <th>Fin</th>
-                    <th>Editar</th>
-                    <th>Borrar</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr th:each="reserva : ${reservas}">
-                    <td th:text="${reserva.id}">ID</td>
-                    <td th:text="${reserva.usuario.username}"></td>
-                    <td th:text="${reserva.horario.instalacion.nombre}">Nombre Instalación</td>
-                    <td th:text="${reserva.fecha}"></td>
-                    <td th:text="${reserva.horario.horaInicio}">Inicio</td>
-                    <td th:text="${reserva.horario.horaFin}">Fin</td>
-                    <td> <a class="btn btn-success" th:href="|reserva/edit/${reserva.id}|"> Editar </a> </td> 
-                    <td> <a class="btn btn-danger" th:href="|reserva/del/${reserva.id}">Borrar</a></td>
-                </tr>
-            </tbody>
+        
+        <div class="m-2">
+            <a class="btn btn-primary" th:href="|reserva/add|">Añadir reserva</a>
+        </div>
 
-        </table>
+        <div class="mb-3">
+            <form method="get" th:action="@{/reserva}">
+                <label for="usuarioId"><strong> Filtrar por usuario:</strong></label>
+                <select id="usuarioId" name="usuarioId" class="form-control" onchange="this.form.submit()">
+                    <option value="">Todas los usuarios</option>
+                    <option th:each="usuario : ${usuarios}"
+                            th:value="${usuario.id}"
+                            th:text="${usuario.username}"
+                            th:selected="${usuario.id == usuarioSeleccionado}">
+                    </option>
+                </select>
+            </form>
+        </div>
+
+        <div class="border rounded-3 m-2 p-2 border-2">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        
+                        <th>Usuario</th>
+                        <th>Instalación</th>
+                        <th>Fecha</th>
+                        <th>Horario</th>
+                        
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="reserva : ${reservas}">
+                        <td th:text="${reserva.id}" hidden>ID</td>
+                        <td th:text="${reserva.usuario.username}"></td>
+                        <td th:text="${reserva.horario.instalacion.nombre}"></td>
+                        <td th:text="${reserva.fecha}"></td>
+                        <td th:text="${reserva.horario.horaInicio + ' - ' + reserva.horario.horaFin}" ></td>
+                        <td>
+                            <a class="btn btn-success" th:href="|reserva/edit/${reserva.id}|"> Editar </a> 
+                            <a class="btn btn-danger" th:href="|reserva/del/${reserva.id}">Borrar</a>
+                        </td>
+                        
+                        
+                    </tr>
+                </tbody>
+                
+            </table>
+        </div>
+        
+       
     </div>
 </body>
