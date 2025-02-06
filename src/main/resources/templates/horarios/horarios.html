@@ -58,7 +58,7 @@
                     <td th:text="${horario.horaFin}">Fin</td>
                     <td> <a class="btn btn-success" th:href="|horario/edit/${horario.id}|"> editar </a> </td>
                     <td> <a class="btn btn-danger" th:href="|horario/del/${horario.id}|"> borrar </a> </td>
-                    <td> <a class="btn btn-primary" th:href="|reserva/${horario.id}|"> Reservar una pista </a> </td>
+                    <td> <a th:href="@{/reserva/add/{id}(id=${horario.id})}" class="btn btn-primary">Reservar</a> </td>
                 </tr> 
             </tbody>
         </table>

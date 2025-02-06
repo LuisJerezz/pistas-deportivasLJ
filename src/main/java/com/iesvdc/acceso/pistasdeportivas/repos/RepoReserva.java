@@ -7,6 +7,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import com.iesvdc.acceso.pistasdeportivas.modelos.Horario;
 import com.iesvdc.acceso.pistasdeportivas.modelos.Reserva;
 import com.iesvdc.acceso.pistasdeportivas.modelos.Usuario;
 
@@ -19,5 +20,7 @@ public interface RepoReserva extends JpaRepository<Reserva,Long>{
     Page<Reserva> findByUsuario(Usuario usuario, Pageable pageable);
 
     Page<Reserva> findByUsuarioId(Long usuarioId, Pageable pageable);
+
+    boolean existsByUsuarioAndHorario(Usuario usuario, Horario horario);
 
 }

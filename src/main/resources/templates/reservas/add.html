@@ -11,74 +11,54 @@
 
         <h3>Agregar Reserva</h3>
 
+        <br><br><br>
         <div class="container">
             <div class="border rounded-3 m-2 p-4 border-2">
+                <form th:action="@{'/reserva/add/' + ${horario.id}}" th:object="${reserva}" method="post">
 
-
-
-                <form th:action="@{/mis-datos/mis-reservas/add}" method="get">
-
-                    <div class="mb-3"> 
-                        <div class="mb-3">
-                            <label for="usuario" class="form-label">Usuario</label>
-                            <select id="usuario" name="usuarioId" class="form-control" required>
-                                <option value="">Selecciona un usuario</option>
-                                <option th:each="usuario : ${usuarios}"
-                                        th:value="${usuario.id}"
-                                        th:text="${usuario.username}"
-                                        >
-                                    </option>
-                                
-                            </select>
-                        </div>
-                    </div>
-
+                    
                     <div class="mb-3">
-
-                        <label for="instalacion" class="form-label">Instalación</label>
-                        <select id="instalacion" name="instalacionId" class="form-control" required 
-                                onchange="this.form.submit()"> 
-                            <option value="">Seleccione una instalación</option>
-                            <option th:each="instalacion : ${instalaciones}" 
-                                    th:value="${instalacion.id}" 
-                                    th:text="${instalacion.nombre}" 
-                                    th:selected="${instalacion.id == instalacionSeleccionada}">
+                        <label for="usuario" class="form-label">Usuario</label>
+                        <select id="usuario" name="usuarioId" class="form-control" required>
+                            <option value="">Selecciona un usuario</option>
+                            <option th:each="usuario : ${usuarios}"
+                                    th:value="${usuario.id}"
+                                    th:text="${usuario.username}">
                             </option>
                         </select>
                     </div>
-                </form>
-
-                <form th:action="@{/mis-datos/mis-reservas/add}" th:object="${reserva}" method="post">
-                    <input type="hidden" name="usuario.id" th:value="${reserva.usuario.id}">
-                    <input type="hidden" name="instalacionId" th:value="${instalacionSeleccionada}">
 
                     
-
                     <div class="mb-3">
-                        <label for="fecha" class="form-label">Fecha</label>
-                        <input type="date" id="fecha" name="fecha" class="form-control" 
-                               th:field="*{fecha}" required min="[[${#dates.format(#dates.createNow(), 'yyyy-MM-dd')}]]">
+                        <label for="instalacion" class="form-label">Instalación</label>
+                        <input type="text" id="instalacion" class="form-control" th:value="${instalacion.nombre}" disabled>
+                        <input type="hidden" name="instalacionId" th:value="${instalacion.id}">
                     </div>
 
                     <div class="mb-3">
                         <label for="horario" class="form-label">Horario</label>
-                        <select id="horario" name="horarioId" class="form-control" required>
-                            <option value="">Seleccione un horario</option>
-                            <option th:each="horario : ${horariosDisponibles}" 
-                                    th:value="${horario.id}" 
-                                    th:text="${horario.horaInicio + ' - ' + horario.horaFin}">
-                            </option>
-                        </select>
+                        <input type="text" id="horario" class="form-control" 
+                               th:value="${horario.horaInicio + ' - ' + horario.horaFin}" disabled>
+                        <input type="hidden" name="horarioId" th:value="${horario.id}">
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="fecha" class="form-label">Fecha</label>
+                        <input type="date" id="fecha" name="fecha" class="form-control" 
+                               th:field="*{fecha}" required 
+                               min="[[${#dates.format(#dates.createNow(), 'yyyy-MM-dd')}]]" 
+                               max="[[${#dates.format(#dates.addDays(#dates.createNow(), 7), 'yyyy-MM-dd')}]]">
                     </div>
 
                     <div class="d-flex gap-2">
                         <button type="submit" class="btn btn-primary">Guardar</button>
-                        <a th:href="@{/mis-datos/mis-reservas}" class="btn btn-secondary">Cancelar</a>
+                        <a th:href="@{/reserva}" class="btn btn-secondary">Cancelar</a>
                     </div>
                 </form>                
             </div>
         </div>
 
+        <br><br><br><br><br><br><br>
         <div th:replace="~{plantilla/fragmentos.html :: footer}"></div>
     </div>
 </body>

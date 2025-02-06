@@ -1,5 +1,6 @@
 package com.iesvdc.acceso.pistasdeportivas.controladores;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -7,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -49,71 +51,49 @@ public class ControReserva {
     
 
     @GetMapping("")
-public String getReservas(
-    Model model, 
-    @PageableDefault(size = 10, sort = "id") Pageable pageable,
-    @RequestParam(required = false) Long usuarioId) {
+    public String getReservas(
+        Model model, 
+        @PageableDefault(size = 10, sort = "id") Pageable pageable,
+        @RequestParam(required = false) Long usuarioId) {
 
-    Page<Reserva> page;
-    
-    if (usuarioId != null) {
-        page = repoReserva.findByUsuarioId(usuarioId, pageable);
-    } else {
-        page = repoReserva.findAll(pageable);
-    }
-
-    List<Usuario> usuarios = repoUsuario.findAll();
-
-    model.addAttribute("page", page);
-    model.addAttribute("reservas", page.getContent());
-    model.addAttribute("usuarios", usuarios);
-    model.addAttribute("usuarioSeleccionado", usuarioId);
-
-    return "reservas/reservas";
-}
-
-    
-
-    
-    
-
-    //@GetMapping("/add")
-    //public String addReserva(Model model) {
-    //    model.addAttribute("reserva", new Reserva());
-    //    model.addAttribute("operacion", "ADD");
-    //    model.addAttribute("usuarios", repoUsuario.findAll());
-    //    return "/reservas/add";
-    //}
-    //
-    //
-    //@PostMapping("/add")
-    //public String addReserva(@ModelAttribute("reserva") Reserva reserva) {
-    //    repoReserva.save(reserva);
-    //    
-    //    return "redirect:/reservas";
-    //}
-
-
-    @GetMapping("/edit/{id}")
-    public String editReserva(
-        @PathVariable @NonNull Long id,
-        Model model) {
-
-        Optional<Reserva> opReserva = repoReserva.findById(id);
-        if (opReserva.isPresent()) {
-            Reserva reserva = opReserva.get();
-            model.addAttribute("reserva", opReserva.get());
-            model.addAttribute("instalaciones", repoInstalacion.findAll());
-            List<Horario> horarios = repoHorario.findByInstalacion(reserva.getHorario().getInstalacion());
-            model.addAttribute("horario", horarios);
-            return "reservas/edit";
-        } else {
-            model.addAttribute("mensaje", "LA INSTALACIÓN NO EXISTE");
-            model.addAttribute("titulo", "ERROR EN LA EDICIÓN DE LA INSTALACIÓN");
-            return "/error";
-        }
+        Page<Reserva> page;
         
-    }
+        if (usuarioId != null) {
+            page = repoReserva.findByUsuarioId(usuarioId, pageable);
+        } else {
+            page = repoReserva.findAll(pageable);
+        }
+
+        List<Usuario> usuarios = repoUsuario.findAll();
+
+        model.addAttribute("page", page);
+        model.addAttribute("reservas", page.getContent());
+        model.addAttribute("usuarios", usuarios);
+        model.addAttribute("usuarioSeleccionado", usuarioId);
+
+        return "reservas/reservas";
+        }
+
+        @GetMapping("/edit/{id}")
+        public String editReserva(
+            @PathVariable @NonNull Long id,
+            Model model) {
+
+            Optional<Reserva> opReserva = repoReserva.findById(id);
+            if (opReserva.isPresent()) {
+                Reserva reserva = opReserva.get();
+                model.addAttribute("reserva", opReserva.get());
+                model.addAttribute("instalaciones", repoInstalacion.findAll());
+                List<Horario> horarios = repoHorario.findByInstalacion(reserva.getHorario().getInstalacion());
+                model.addAttribute("horario", horarios);
+                return "reservas/edit";
+            } else {
+                model.addAttribute("mensaje", "LA INSTALACIÓN NO EXISTE");
+                model.addAttribute("titulo", "ERROR EN LA EDICIÓN DE LA INSTALACIÓN");
+                return "/error";
+            }
+
+        }
     
 
     @PostMapping("/edit/{id}")
@@ -121,20 +101,17 @@ public String getReservas(
         @PathVariable Long id,
         @RequestParam("horarioId") Long horarioId,
         @ModelAttribute("reserva") Reserva reserva) {
-    
         
-    Optional<Reserva> optReserva = repoReserva.findById(id);
-    Optional<Horario> optHorario = repoHorario.findById(horarioId);
-    
-    
+        Optional<Reserva> optReserva = repoReserva.findById(id);
+        Optional<Horario> optHorario = repoHorario.findById(horarioId);
+       
         Reserva reservaActualizada = optReserva.get();
         Horario nuevoHorario = optHorario.get();
 
-        // Actualizar el horario y la fecha
         reservaActualizada.setHorario(nuevoHorario);
-        reservaActualizada.setFecha(reserva.getFecha());  // Asegúrate de actualizar la fecha
+        reservaActualizada.setFecha(reserva.getFecha());  
 
-        repoReserva.save(reservaActualizada);  // Guardar la reserva actualizada
+        repoReserva.save(reservaActualizada);  
         return "redirect:/reserva";
     }
 
@@ -161,14 +138,14 @@ public String getReservas(
     @PostMapping("/del/{id}")
     public String delReservaPost(
         @PathVariable Long id,
-        Model model) {
+        Model model){
     
             Optional<Reserva> opReserva = repoReserva.findById(id);
-            if (opReserva.isPresent()) {
+            if (opReserva.isPresent()){
                 Reserva reserva = opReserva.get();
                 repoReserva.delete(reserva);
                 return "redirect:/reserva";
-            } else {
+            } else{
                 model.addAttribute("mensaje", "LA INSTALACIÓN NO EXISTE");
                 model.addAttribute("titulo", "ERROR EN LA EDICIÓN DE LA INSTALACIÓN");
                 return "/error";
@@ -176,46 +153,81 @@ public String getReservas(
     }
         
 
-    //@GetMapping("/mis-reservas/add")
-    //public String addReserva(@RequestParam(name = "instalacionId", required = false) Long instalacionId, Model model) {
-    //    List<Instalacion> instalaciones = repoInstalacion.findAll();
-    //    
-    //    Reserva reserva = new Reserva();
-    //
-    //    List<Horario> horariosDisponibles = (instalacionId != null) ? 
-    //        repoHorario.findByInstalacion(repoInstalacion.findById(instalacionId).orElse(null)) :
-    //        List.of();
-    //
-    //    model.addAttribute("reserva", reserva);
-    //    model.addAttribute("instalaciones", instalaciones);
-    //    model.addAttribute("instalacionSeleccionada", instalacionId);
-    //    model.addAttribute("horariosDisponibles", horariosDisponibles);
-    //
-    //    return "mis-datos/add";
-    //}
+    
 
-    @GetMapping("/add")
-    public String addReserva(
-        @RequestParam(name = "instalacionId", required = false)
-        Long instalacionId, 
-        Model model) {
-        List<Instalacion> instalaciones = repoInstalacion.findAll();
-        
+    @GetMapping("/add/{horarioId}")
+    public String addReserva(@PathVariable("horarioId") Long horarioId, Model model) {
+        Optional<Horario> optHorario = repoHorario.findById(horarioId);
+        if (optHorario.isEmpty()){
+            model.addAttribute("mensaje", "El horario no existe");
+
+            return "/error"; 
+        }
+        Horario horario = optHorario.get();
+        Instalacion instalacion = horario.getInstalacion();
+        if (instalacion==null){
+            model.addAttribute("mensaje", "La instalación no existe");
+            return "/error"; 
+        }
+
+        List<Usuario> usuarios = repoUsuario.findAll();
+        if (usuarios.isEmpty()){
+            model.addAttribute("mensaje", "No hay usuarios registrados");
+            return "/error"; 
+        }
+
         Reserva reserva = new Reserva();
-        
-        List<Horario> horariosDisponibles = (instalacionId != null) ? 
-            repoHorario.findByInstalacion(repoInstalacion.findById(instalacionId).orElse(null)) :
-            List.of();
-    
+
         model.addAttribute("reserva", reserva);
-        model.addAttribute("instalaciones", instalaciones);
-        model.addAttribute("instalacionSeleccionada", instalacionId);
-        model.addAttribute("horariosDisponibles", horariosDisponibles);
-        model.addAttribute("usuarios", repoUsuario.findAll());
-        
-        return "/reserva/add";
-    }
+        model.addAttribute("instalacion", instalacion);
+        model.addAttribute("horario", horario);
+        model.addAttribute("usuarios", usuarios);
+
+        return "reservas/add"; 
+}
+
     
+    @PostMapping("/add/{horarioId}")
+    public String addReserva(
+        @PathVariable("horarioId") Long horarioId,
+        @RequestParam("usuarioId") Long usuarioId,
+        @RequestParam("fecha") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fecha,
+        Model model){
+
+        Optional<Horario> optHorario = repoHorario.findById(horarioId);
+        if (optHorario.isEmpty()){
+            model.addAttribute("mensaje", "El horario no existe");
+            return "/error";
+        }
+        Horario horario = optHorario.get();
+
+        Optional<Usuario> optUsuario = repoUsuario.findById(usuarioId);
+        if (optUsuario.isEmpty()){
+            model.addAttribute("mensaje", "El usuario no existe");
+            return "/error";
+        }
+        Usuario usuario = optUsuario.get();
+
+        if (repoReserva.existsByUsuarioAndHorario(usuario, horario)){
+            model.addAttribute("mensaje", "El usuario ya tiene una reserva para este horario");
+            return "reservas/add";
+        }
+
+        Reserva reserva = new Reserva();
+        reserva.setUsuario(usuario);
+        reserva.setHorario(horario);
+        reserva.setFecha(fecha); 
+
+        repoReserva.save(reserva);
+
+        return "redirect:/reserva";
+    }
+
+
+
+
+
+
 }
     
 
