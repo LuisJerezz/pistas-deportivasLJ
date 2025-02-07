@@ -57,6 +57,12 @@
                                     <li><a class="nav-link text-white" href="/usuario/add">Alta</a></li>
                                 </ul>
                             </li>
+                            <li sec:authorize="hasAuthority('ADMIN')" class="nav-item">
+                                
+                                <a class="nav-link text-white active" aria-current="page" href="/reserva">
+                                    <i class="fa-solid fa-indent"></i> | Reserva</a>
+                                
+                            </li>
                             <li class="nav-item">
                                 <a class="nav-link text-white dropdown-toggle" href="#" id="ayudaDropdown" data-bs-toggle="collapse" data-bs-target="#ayudaMenu" aria-expanded="false">
                                     <i class="fa-solid fa-info"></i> |  Ayuda

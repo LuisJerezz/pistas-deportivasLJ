@@ -28,10 +28,6 @@ import com.iesvdc.acceso.pistasdeportivas.repos.RepoInstalacion;
 import com.iesvdc.acceso.pistasdeportivas.repos.RepoReserva;
 import com.iesvdc.acceso.pistasdeportivas.repos.RepoUsuario;
 
-
-
-
-
 @Controller
 @RequestMapping("/reserva")
 public class ControReserva {
@@ -159,9 +155,7 @@ public class ControReserva {
                 return "/error";
             }
     }
-        
-
-    
+            
 
     @GetMapping("/add/{horarioId}")
     public String addReserva(@PathVariable("horarioId") Long horarioId, Model model) {
@@ -195,65 +189,57 @@ public class ControReserva {
 }
 
     
-@PostMapping("/add/{horarioId}")
-public String addReserva(
-    @PathVariable("horarioId") Long horarioId,
-    @RequestParam("usuarioId") Long usuarioId,
-    @RequestParam("fecha") LocalDate fecha,
-    RedirectAttributes redirectAttributes){
-
-    LocalDate hoy = LocalDate.now();
-    LocalDate limiteInferior = hoy.minusDays(0);
-    LocalDate limiteSuperior = hoy.plusDays(7);
-
-    if (fecha.isBefore(limiteInferior) || fecha.isAfter(limiteSuperior)) {
-        redirectAttributes.addFlashAttribute("mensaje", "La reserva solo puede hacerse dentro de los 7 días anteriores o posteriores al día de hoy.");
+    @PostMapping("/add/{horarioId}")
+    public String addReserva(
+        @PathVariable("horarioId") Long horarioId,
+        @RequestParam("usuarioId") Long usuarioId,
+        @RequestParam("fecha") LocalDate fecha,
+        RedirectAttributes redirectAttributes){
+        
+        LocalDate hoy = LocalDate.now();
+        LocalDate limiteInferior = hoy.minusDays(0);
+        LocalDate limiteSuperior = hoy.plusDays(7);
+        
+        if (fecha.isBefore(limiteInferior) || fecha.isAfter(limiteSuperior)) {
+            redirectAttributes.addFlashAttribute("mensaje", "La reserva solo puede hacerse dentro de los 7 días anteriores o posteriores al día de hoy.");
+            return "redirect:/reserva";
+        }
+    
+        Optional<Horario> optHorario = repoHorario.findById(horarioId);
+        if (optHorario.isEmpty()){
+            redirectAttributes.addFlashAttribute("mensaje", "El horario no existe.");
+            return "redirect:/reserva";
+        }
+        Horario horario = optHorario.get();
+    
+        Optional<Usuario> optUsuario = repoUsuario.findById(usuarioId);
+        if (optUsuario.isEmpty()){
+            redirectAttributes.addFlashAttribute("mensaje", "El usuario no existe.");
+            return "redirect:/reserva";
+        }
+        Usuario usuario = optUsuario.get();
+    
+        // Verificar si el usuario ya tiene una reserva para ese día
+        boolean reservaExistente = repoReserva.findByUsuarioAndFecha(usuario, fecha).isPresent();
+        if (reservaExistente) {
+            redirectAttributes.addFlashAttribute("mensaje", "No puedes hacer más de una reserva por día.");
+            return "redirect:/reserva";
+        }
+    
+        if (repoReserva.existsByUsuarioAndHorario(usuario, horario)){
+            redirectAttributes.addFlashAttribute("mensaje", "El usuario ya tiene una reserva para este horario.");
+            return "redirect:/reserva";
+        }
+    
+        Reserva reserva = new Reserva();
+        reserva.setUsuario(usuario);
+        reserva.setHorario(horario);
+        reserva.setFecha(fecha);
+    
+        repoReserva.save(reserva);
+    
         return "redirect:/reserva";
     }
-
-    Optional<Horario> optHorario = repoHorario.findById(horarioId);
-    if (optHorario.isEmpty()){
-        redirectAttributes.addFlashAttribute("mensaje", "El horario no existe.");
-        return "redirect:/reserva";
-    }
-    Horario horario = optHorario.get();
-
-    Optional<Usuario> optUsuario = repoUsuario.findById(usuarioId);
-    if (optUsuario.isEmpty()){
-        redirectAttributes.addFlashAttribute("mensaje", "El usuario no existe.");
-        return "redirect:/reserva";
-    }
-    Usuario usuario = optUsuario.get();
-
-    // Verificar si el usuario ya tiene una reserva para ese día
-    boolean reservaExistente = repoReserva.findByUsuarioAndFecha(usuario, fecha).isPresent();
-    if (reservaExistente) {
-        redirectAttributes.addFlashAttribute("mensaje", "No puedes hacer más de una reserva por día.");
-        return "redirect:/reserva";
-    }
-
-    if (repoReserva.existsByUsuarioAndHorario(usuario, horario)){
-        redirectAttributes.addFlashAttribute("mensaje", "El usuario ya tiene una reserva para este horario.");
-        return "redirect:/reserva";
-    }
-
-    Reserva reserva = new Reserva();
-    reserva.setUsuario(usuario);
-    reserva.setHorario(horario);
-    reserva.setFecha(fecha);
-
-    repoReserva.save(reserva);
-
-    return "redirect:/reserva";
-}
-
-
-
-
-
-
-
-
 
 }
     
