@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head th:replace="~{plantilla/fragmentos.html :: headfiles}">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editar Reserva</title>
+</head>
+<body>
+    <div class="container-fluid">
+        <div th:replace="~{plantilla/fragmentos.html :: navigation}"></div>
+
+        <h3>Editar Reserva</h3>
+
+        <div class="container">
+            <div class="border rounded-3 m-2 p-4 border-2">
+                <form th:action="@{/reserva/edit/{id}(id=${reserva.id})}" th:object="${reserva}" method="post">
+                    
+                    <input type="hidden" name="usuario.id" th:value="${reserva.usuario.id}">
+
+                    <input type="hidden" name="horario.id" th:value="${reserva.horario.id}">
+
+                    <div class="mb-3" hidden>
+                        <label for="id" class="form-label">ID</label>
+                        <input type="text" id="id" name="id" class="form-control" th:value="${reserva.id}" disabled>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="id" class="form-label">Usuario</label>
+                        <input type="text" id="id" name="id" class="form-control" th:value="${reserva.id}" disabled>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="instalacion" class="form-label">Instalación</label>
+                        <input type="text" id="instalacion" name="instalacion" class="form-control" th:value="${reserva.horario.instalacion.nombre}" disabled>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="fecha" class="form-label">Fecha</label>
+                        <input type="date" id="fecha" name="fecha" class="form-control" th:value="${reserva.fecha}">
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="horario" class="form-label">Horario</label>
+                        <select id="horario" name="horarioId" class="form-control" >
+                            <option value="">Seleccione un horario</option>
+                            <option th:each="horario : ${horario}" 
+                                    th:value="${horario.id}" 
+                                    th:text="${horario.horaInicio + ' - ' + horario.horaFin}"
+                                    th:selected="${horario.id == reserva.horario.id}">
+                            </option>
+                        </select>
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary">Guardar</button>
+                        <a th:href="@{/reserva}" class="btn btn-secondary">Cancelar</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div th:replace="~{plantilla/fragmentos.html :: footer}"></div>
+    </div>
+</body>
+</html>

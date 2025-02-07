@@ -6,8 +6,6 @@ INSERT INTO usuario (id, username, password, email, enabled, tipo) VALUES(7,	'ob
 INSERT INTO usuario (id, username, password, email, enabled, tipo) VALUES(13,	'gerente',	'$2a$10$hWkDEd0V0QgmiffgPcSkoe1.OMq5ew.wl7OFBMqii5XkfxtIwzZ92',	'gerencia@vdc.com', 1, 'ADMIN');
 INSERT INTO usuario (id, username, password, email, enabled, tipo) VALUES(14,	'luisjerez',	'$2a$10$5CtTZeGfxvZqxQSVMkL3Ie86V9GT1sJTR/7WRSzyXSTZZDYDgA6ai',	'luisjerez@vdc.com', 1, 'USUARIO');
 
--- INSERT INTO usuario_rol (authority, user_username) VALUES ('ADMIN', 'obijuan');
--- INSERT INTO usuario_rol (authority, user_username) VALUES ('USER', 'obijuan');
 
 INSERT INTO instalacion (id, nombre) VALUES (7,	'tenis arriba');
 INSERT INTO instalacion (id, nombre) VALUES (8,	'tenis césped artificial');

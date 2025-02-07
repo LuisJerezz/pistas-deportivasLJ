@@ -1,71 +1,65 @@
 <!DOCTYPE html>
-<html lang="en">
-
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{plantilla/fragmentos.html :: headfiles}">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title th:text="${operacion == 'EDIT' ? 'Editar Reserva' : 'Nueva Reserva'}">Reserva</title>
+    <title>Agregar Reserva</title>
 </head>
-
 <body>
     <div class="container-fluid">
-        <!-- Barra de navegación -->
-        <div th:replace="plantilla/fragmentos.html :: navigation"></div>
+        <div th:replace="~{plantilla/fragmentos.html :: navigation}"></div>
 
-        <!-- Contenedor principal -->
-        <div class="container mt-4">
-            <h2 th:text="${operacion == 'EDIT' ? 'Editar Reserva' : 'Añadir Nueva Reserva'}"></h2>
+        <h3>Agregar Reserva</h3>
 
-            <!-- Formulario -->
-            <form method="post" th:object="${reserva}" class="needs-validation" novalidate>
-                <!-- Campo oculto para ID (sólo se utiliza en edición) -->
-                <input type="hidden" th:if="${operacion == 'EDIT'}" th:field="*{id}" />
+        <br><br><br>
+        <div class="container">
+            <div class="border rounded-3 m-2 p-4 border-2">
+                <form th:action="@{'/reserva/add/' + ${horario.id}}" th:object="${reserva}" method="post">
 
-                <!-- Selección de instalación -->
-                <div class="mb-3">
-                    <label for="instalacion" class="form-label">Instalación</label>
-                    <select id="instalacion" name="instalacion" th:field="*{horario.instalacion}" 
-                            class="form-select" 
-                            th:disabled="${operacion == 'DEL'} ? true : false">
-                        <option value="" disabled selected>Seleccione una instalación</option>
-                        <option th:each="instalacion : ${instalaciones}" 
-                                th:value="${instalacion.id}" 
-                                th:text="${instalacion.nombre}" 
-                                th:selected="${reserva.horario?.instalacion?.id == instalacion.id}">
-                        </option>
-                    </select>
-                </div>
+                    
+                    <div class="mb-3">
+                        <label for="usuario" class="form-label">Usuario</label>
+                        <select id="usuario" name="usuarioId" class="form-control" required>
+                            <option value="">Selecciona un usuario</option>
+                            <option th:each="usuario : ${usuarios}"
+                                    th:value="${usuario.id}"
+                                    th:text="${usuario.username}">
+                            </option>
+                        </select>
+                    </div>
 
-                <!-- Hora de inicio -->
-                <div class="mb-3">
-                    <label for="horaInicio" class="form-label">Hora de Inicio</label>
-                    <input type="time" id="horaInicio" name="horaInicio" 
-                           class="form-control" 
-                           th:field="*{horario.horaInicio}" 
-                           th:disabled="${operacion == 'DEL'} ? true : false" />
-                </div>
+                    
+                    <div class="mb-3">
+                        <label for="instalacion" class="form-label">Instalación</label>
+                        <input type="text" id="instalacion" class="form-control" th:value="${instalacion.nombre}" disabled>
+                        <input type="hidden" name="instalacionId" th:value="${instalacion.id}">
+                    </div>
 
-                <!-- Hora de fin -->
-                <div class="mb-3">
-                    <label for="horaFin" class="form-label">Hora de Fin</label>
-                    <input type="time" id="horaFin" name="horaFin" 
-                           class="form-control" 
-                           th:field="*{horario.horaFin}" 
-                           th:disabled="${operacion == 'DEL'} ? true : false" />
-                </div>
+                    <div class="mb-3">
+                        <label for="horario" class="form-label">Horario</label>
+                        <input type="text" id="horario" class="form-control" 
+                               th:value="${horario.horaInicio + ' - ' + horario.horaFin}" disabled>
+                        <input type="hidden" name="horarioId" th:value="${horario.id}">
+                    </div>
 
-                <!-- Botones de acción -->
-                <div class="d-flex justify-content-between">
-                    <a class="btn btn-secondary" th:href="@{/reserva}">Cancelar</a>
-                    <button type="submit" class="btn btn-primary" 
-                            th:text="${operacion == 'EDIT' ? 'Guardar Cambios' : 'Añadir Reserva'}"></button>
-                </div>
-            </form>
+                    <div class="mb-3">
+                        <label for="fecha" class="form-label">Fecha</label>
+                        <input type="date" id="fecha" name="fecha" class="form-control" 
+                               th:field="*{fecha}" required 
+                               min="[[${#dates.format(#dates.createNow(), 'yyyy-MM-dd')}]]" 
+                               max="[[${#dates.format(#dates.addDays(#dates.createNow(), 7), 'yyyy-MM-dd')}]]">
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary">Guardar</button>
+                        <a th:href="@{/reserva}" class="btn btn-secondary">Cancelar</a>
+                    </div>
+                </form>                
+            </div>
         </div>
-
-        <!-- Pie de página -->
-        <div th:replace="plantilla/fragmentos.html :: footer"></div>
+        
+        <br><br><br><br><br><br><br>
+        <div th:replace="~{plantilla/fragmentos.html :: footer}"></div>
     </div>
 </body>
-
 </html>
