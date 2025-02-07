@@ -60,3 +60,6 @@ spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.MySQL8Dialect
 Para que el usuario no pueda realizar más de una reserva al día se le añade un disparador a nuestra base de datos.
 Para controlar que no pueda reservar 7 días antes también se puede generar un disparador además de controlarlo en la vista thymeleaf.
 
+[Repositorio Github](https://github.com/LuisJerezz/pistas-deportivasLJ/tree/dev)
+
+
