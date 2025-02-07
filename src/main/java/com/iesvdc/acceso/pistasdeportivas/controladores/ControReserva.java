@@ -8,7 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -78,11 +77,19 @@ public class ControReserva {
         @GetMapping("/edit/{id}")
         public String editReserva(
             @PathVariable @NonNull Long id,
-            Model model) {
+            Model model,
+            RedirectAttributes redirectAttributes) {
 
             Optional<Reserva> opReserva = repoReserva.findById(id);
             if (opReserva.isPresent()) {
                 Reserva reserva = opReserva.get();
+                LocalDate fechaActual = LocalDate.now();
+
+                if (reserva.getFecha().isBefore(fechaActual) || reserva.getFecha().isEqual(fechaActual)) {
+                    redirectAttributes.addFlashAttribute("mensaje", "No se puede editar una reserva que ya ha pasado o está programada para hoy.");
+                    return "redirect:/reserva";
+                }
+
                 model.addAttribute("reserva", opReserva.get());
                 model.addAttribute("instalaciones", repoInstalacion.findAll());
                 List<Horario> horarios = repoHorario.findByInstalacion(reserva.getHorario().getInstalacion());
@@ -192,7 +199,7 @@ public class ControReserva {
 public String addReserva(
     @PathVariable("horarioId") Long horarioId,
     @RequestParam("usuarioId") Long usuarioId,
-    @RequestParam("fecha") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fecha,
+    @RequestParam("fecha") LocalDate fecha,
     RedirectAttributes redirectAttributes){
 
     LocalDate hoy = LocalDate.now();
@@ -201,20 +208,20 @@ public String addReserva(
 
     if (fecha.isBefore(limiteInferior) || fecha.isAfter(limiteSuperior)) {
         redirectAttributes.addFlashAttribute("mensaje", "La reserva solo puede hacerse dentro de los 7 días anteriores o posteriores al día de hoy.");
-        return "redirect:/error";
+        return "redirect:/reserva";
     }
 
     Optional<Horario> optHorario = repoHorario.findById(horarioId);
     if (optHorario.isEmpty()){
         redirectAttributes.addFlashAttribute("mensaje", "El horario no existe.");
-        return "redirect:/error";
+        return "redirect:/reserva";
     }
     Horario horario = optHorario.get();
 
     Optional<Usuario> optUsuario = repoUsuario.findById(usuarioId);
     if (optUsuario.isEmpty()){
         redirectAttributes.addFlashAttribute("mensaje", "El usuario no existe.");
-        return "redirect:/error";
+        return "redirect:/reserva";
     }
     Usuario usuario = optUsuario.get();
 
@@ -222,12 +229,12 @@ public String addReserva(
     boolean reservaExistente = repoReserva.findByUsuarioAndFecha(usuario, fecha).isPresent();
     if (reservaExistente) {
         redirectAttributes.addFlashAttribute("mensaje", "No puedes hacer más de una reserva por día.");
-        return "redirect:/error";
+        return "redirect:/reserva";
     }
 
     if (repoReserva.existsByUsuarioAndHorario(usuario, horario)){
         redirectAttributes.addFlashAttribute("mensaje", "El usuario ya tiene una reserva para este horario.");
-        return "redirect:/error";
+        return "redirect:/reserva";
     }
 
     Reserva reserva = new Reserva();

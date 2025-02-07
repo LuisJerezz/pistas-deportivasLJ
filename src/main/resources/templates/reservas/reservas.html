@@ -8,10 +8,18 @@
 </head>
 
 <body>
+    
+
     <div class="container-fluid">
-        
         <div th:replace="plantilla/fragmentos.html :: navigation"></div>
-        
+        <br>
+        <h3>Reservas</h3>
+        <br>
+        <div th:if="${mensaje}" class="alert alert-danger" role="alert">
+            <span th:text="${mensaje}"></span>
+        </div>
+
+
         <div class="m-2">
             <a class="btn btn-primary" th:href="|/horario|">Añadir reserva</a>
         </div>
@@ -60,7 +68,26 @@
                 
             </table>
         </div>
-        
-       
+        <div>
+                <nav aria-label="Page navigation example">
+                    <ul class="pagination">
+                        <li class="page-item">
+                            <a class="page-link" th:href="${page.hasPrevious()} ? |reservas?page=${page.number -1}| : '#'">
+                                <i class="fa-solid fa-chevron-left"></i> Anterior
+                            </a>
+                        </li>
+                        <li class="page-item">
+                            <span class="page-link active" th:text="|Página ${page.number+1} de ${page.totalPages}|"></span>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" th:href="${page.hasNext()} ? |reservas?page=${page.number +1}| : '#'">
+                                Siguiente <i class="fa-solid fa-chevron-right"></i>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+            <br><br>
+            <div th:replace="~{plantilla/fragmentos.html :: footer}"></div>
     </div>
 </body>
