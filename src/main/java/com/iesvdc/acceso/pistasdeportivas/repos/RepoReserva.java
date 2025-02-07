@@ -1,6 +1,8 @@
 package com.iesvdc.acceso.pistasdeportivas.repos;
 
+import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -22,5 +24,7 @@ public interface RepoReserva extends JpaRepository<Reserva,Long>{
     Page<Reserva> findByUsuarioId(Long usuarioId, Pageable pageable);
 
     boolean existsByUsuarioAndHorario(Usuario usuario, Horario horario);
+
+    Optional<Reserva> findByUsuarioAndFecha(Usuario usuario, LocalDate fecha);
 
 }

@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.iesvdc.acceso.pistasdeportivas.modelos.Horario;
 import com.iesvdc.acceso.pistasdeportivas.modelos.Instalacion;
@@ -187,41 +188,60 @@ public class ControReserva {
 }
 
     
-    @PostMapping("/add/{horarioId}")
-    public String addReserva(
-        @PathVariable("horarioId") Long horarioId,
-        @RequestParam("usuarioId") Long usuarioId,
-        @RequestParam("fecha") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fecha,
-        Model model){
+@PostMapping("/add/{horarioId}")
+public String addReserva(
+    @PathVariable("horarioId") Long horarioId,
+    @RequestParam("usuarioId") Long usuarioId,
+    @RequestParam("fecha") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fecha,
+    RedirectAttributes redirectAttributes){
 
-        Optional<Horario> optHorario = repoHorario.findById(horarioId);
-        if (optHorario.isEmpty()){
-            model.addAttribute("mensaje", "El horario no existe");
-            return "/error";
-        }
-        Horario horario = optHorario.get();
+    LocalDate hoy = LocalDate.now();
+    LocalDate limiteInferior = hoy.minusDays(0);
+    LocalDate limiteSuperior = hoy.plusDays(7);
 
-        Optional<Usuario> optUsuario = repoUsuario.findById(usuarioId);
-        if (optUsuario.isEmpty()){
-            model.addAttribute("mensaje", "El usuario no existe");
-            return "/error";
-        }
-        Usuario usuario = optUsuario.get();
-
-        if (repoReserva.existsByUsuarioAndHorario(usuario, horario)){
-            model.addAttribute("mensaje", "El usuario ya tiene una reserva para este horario");
-            return "reservas/add";
-        }
-
-        Reserva reserva = new Reserva();
-        reserva.setUsuario(usuario);
-        reserva.setHorario(horario);
-        reserva.setFecha(fecha); 
-
-        repoReserva.save(reserva);
-
-        return "redirect:/reserva";
+    if (fecha.isBefore(limiteInferior) || fecha.isAfter(limiteSuperior)) {
+        redirectAttributes.addFlashAttribute("mensaje", "La reserva solo puede hacerse dentro de los 7 días anteriores o posteriores al día de hoy.");
+        return "redirect:/error";
     }
+
+    Optional<Horario> optHorario = repoHorario.findById(horarioId);
+    if (optHorario.isEmpty()){
+        redirectAttributes.addFlashAttribute("mensaje", "El horario no existe.");
+        return "redirect:/error";
+    }
+    Horario horario = optHorario.get();
+
+    Optional<Usuario> optUsuario = repoUsuario.findById(usuarioId);
+    if (optUsuario.isEmpty()){
+        redirectAttributes.addFlashAttribute("mensaje", "El usuario no existe.");
+        return "redirect:/error";
+    }
+    Usuario usuario = optUsuario.get();
+
+    // Verificar si el usuario ya tiene una reserva para ese día
+    boolean reservaExistente = repoReserva.findByUsuarioAndFecha(usuario, fecha).isPresent();
+    if (reservaExistente) {
+        redirectAttributes.addFlashAttribute("mensaje", "No puedes hacer más de una reserva por día.");
+        return "redirect:/error";
+    }
+
+    if (repoReserva.existsByUsuarioAndHorario(usuario, horario)){
+        redirectAttributes.addFlashAttribute("mensaje", "El usuario ya tiene una reserva para este horario.");
+        return "redirect:/error";
+    }
+
+    Reserva reserva = new Reserva();
+    reserva.setUsuario(usuario);
+    reserva.setHorario(horario);
+    reserva.setFecha(fecha);
+
+    repoReserva.save(reserva);
+
+    return "redirect:/reserva";
+}
+
+
+
 
 
 
