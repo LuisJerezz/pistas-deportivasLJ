@@ -10,6 +10,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import com.iesvdc.acceso.pistasdeportivas.modelos.Horario;
+import com.iesvdc.acceso.pistasdeportivas.modelos.Instalacion;
 import com.iesvdc.acceso.pistasdeportivas.modelos.Reserva;
 import com.iesvdc.acceso.pistasdeportivas.modelos.Usuario;
 
@@ -26,5 +27,8 @@ public interface RepoReserva extends JpaRepository<Reserva,Long>{
     boolean existsByUsuarioAndHorario(Usuario usuario, Horario horario);
 
     Optional<Reserva> findByUsuarioAndFecha(Usuario usuario, LocalDate fecha);
+
+    boolean existsByHorarioAndFechaAndHorario_Instalacion(Horario horario, LocalDate fecha, Instalacion instalacion);
+
 
 }

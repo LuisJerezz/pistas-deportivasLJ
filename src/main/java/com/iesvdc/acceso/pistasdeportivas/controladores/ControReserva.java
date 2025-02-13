@@ -211,6 +211,7 @@ public class ControReserva {
             return "redirect:/reserva";
         }
         Horario horario = optHorario.get();
+        Instalacion instalacion = horario.getInstalacion();
     
         Optional<Usuario> optUsuario = repoUsuario.findById(usuarioId);
         if (optUsuario.isEmpty()){
@@ -228,6 +229,12 @@ public class ControReserva {
     
         if (repoReserva.existsByUsuarioAndHorario(usuario, horario)){
             redirectAttributes.addFlashAttribute("mensaje", "El usuario ya tiene una reserva para este horario.");
+            return "redirect:/reserva";
+        }
+
+         // Verificar si la instalación ya está reservada en ese horario y fecha
+        if (repoReserva.existsByHorarioAndFechaAndHorario_Instalacion(horario, fecha, instalacion)) {
+            redirectAttributes.addFlashAttribute("mensaje", "Otro usuario ya ha reservado esta pista a esta hora.");
             return "redirect:/reserva";
         }
     
