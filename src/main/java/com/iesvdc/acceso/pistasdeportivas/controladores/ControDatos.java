@@ -256,23 +256,30 @@ public class ControDatos {
             return "error";
         }
     }
-
+    
     @PostMapping("/mis-reservas/del/{id}")
-    public String eliminarReserva(@PathVariable Long id, Model model) {
+    public String eliminarReserva(@PathVariable Long id, RedirectAttributes redirectAttributes) {
         try {
             Reserva reserva = repoReserva.findById(id).orElse(null);
-            if (reserva != null) {
-                repoReserva.delete(reserva);
+            if (reserva == null) {
+                redirectAttributes.addFlashAttribute("mensajeError", "Reserva no encontrada.");
                 return "redirect:/mis-datos/mis-reservas";
-            } else {
-                model.addAttribute("mensaje", "Reserva no encontrada.");
-                return "error";
             }
+        
+            LocalDate hoy = LocalDate.now();
+            if (reserva.getFecha().isBefore(hoy)) {
+                redirectAttributes.addFlashAttribute("mensajeError", "No se pueden eliminar reservas anteriores a la fecha actual.");
+                return "redirect:/mis-datos/mis-reservas";
+            }
+        
+            repoReserva.delete(reserva);
+            return "redirect:/mis-datos/mis-reservas";
         } catch (Exception e) {
-            model.addAttribute("mensaje", "Error al eliminar la reserva: " + e.getMessage());
+            redirectAttributes.addFlashAttribute("mensajeError", "Error al eliminar la reserva: " + e.getMessage());
             e.printStackTrace();
-            return "error";
+            return "redirect:/mis-datos/mis-reservas";
         }
     }
+
     
 }
